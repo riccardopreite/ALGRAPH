@@ -1,59 +1,57 @@
 package sample;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import javafx.scene.shape.Circle;
+
+import java.awt.event.MouseEvent;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.List;
 
-public class Graph implements IGraph {
+public class Graph<T extends Comparable<T>> implements IGraph<T> {
 
 
-	HashMap<Node, HashSet<Node>> vertici;
+	HashMap<Node<T>, HashSet<Node<T>>> vertici;
 
 	public Graph() {
-		this.vertici = new HashMap<Node , HashSet<Node >>();
+		this.vertici = new HashMap<Node<T>, HashSet<Node<T>>>();
 	}
 
 	@Override
-	public void insertNode(Node  son, Node parent ) {
-
-		/*
-		List<Node> son = new Li
-
-		if (!this.vertici.containsKey(x))
-			this.vertici.put(x, new HashSet<Node >());
-*/
+	public void insertNode(Node<T> u) {
+		if (!this.vertici.containsKey(u))
+			this.vertici.put(u, new HashSet<Node<T>>());
 	}
 
 	@Override
-	public void deleteNode(Node  u) {
+	public void deleteNode(Node<T> u) {
 
 		if (this.vertici.containsKey(u)) {
-			for (Node  v : this.vertici.keySet()) {
+			for (Node<T> v : this.vertici.keySet()) {
 				this.deleteEdge(v, u);
 			}
 			this.vertici.remove(u);
 		}
+		else  System.out.println("Not found");
+
 
 	}
 
 	@Override
-	public void insertEdge(Node  u, Node  v) {
+	public void insertEdge(Node<T> u, Node<T> v) {
 		if (this.vertici.containsKey(u) && this.vertici.containsKey(v))
+			System.out.println("U: " + u +" V: " + v);
 			this.vertici.get(u).add(v);
 
 	}
 
 	@Override
-	public void deleteEdge(Node u, Node  v) {
+	public void deleteEdge(Node<T> u, Node<T> v) {
 		if (this.vertici.containsKey(u))
 			this.vertici.get(u).remove(v);
 
 	}
 
 	@Override
-	public Set<Node > adj(Node  u) {
+	public Set<Node<T>> adj(Node<T> u) {
 		// ritorna null se U non esiste
 		if (this.vertici.containsKey(u))
 			return this.vertici.get(u);
@@ -62,17 +60,46 @@ public class Graph implements IGraph {
 	}
 
 	@Override
-	public Set<Node > V() {
+	public Set<Node<T>> V() {
 		return this.vertici.keySet();
 	}
 
 	@Override
 	public void print() {
 
-		for (Entry<Node , HashSet<Node >> e : this.vertici.entrySet()) {
+		for (Entry<Node<T>, HashSet<Node<T>>> e : this.vertici.entrySet()) {
 			System.out.println(e.getKey() + " : " + e.getValue());
 		}
 
+	}
+
+
+	public boolean Find(Double X, Double Y){
+
+		for (Entry<Node<T>, HashSet<Node<T>>> e : this.vertici.entrySet()){
+			if(this.vertici.containsValue(X)){
+				System.out.println("found");
+
+				return true;
+			}
+			else System.out.println("not found");
+
+
+			/*
+			if (this.vertici.containsKey(x)){
+
+				System.out.println("found");
+				return true;
+			}
+			else {
+
+				System.out.println(e.getKey());
+				return false;
+			}
+*/
+
+		}
+		return false;
 	}
 
 }

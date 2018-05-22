@@ -19,4 +19,3 @@ public interface IGraph<T extends Comparable<T>> {
 	// utility: stampa nodi e liste di adiacenza
 	public void print();
 }
-

@@ -12,47 +12,47 @@ import javafx.geometry.*;
 
 public class ConfirmBox {
 
-    static boolean answer;
+  static boolean answer;
 
-    public static boolean display(String title, String message){
+  public static boolean display(String title, String message){
 
-        Stage window = new Stage();
+    Stage window = new Stage();
 
-        window.initModality(Modality.APPLICATION_MODAL);
-        window.setTitle(title);
-        window.setMinWidth(250);
-        Label label = new Label();
-        label.setText(message);
+    window.initModality(Modality.APPLICATION_MODAL);
+    window.setTitle(title);
+    window.setMinWidth(250);
+    Label label = new Label();
+    label.setText(message);
 
-        //Create two buttons
-        Button yesbutton = new Button("Yes");
-        Button nobutton = new Button("No");
+    //Create two buttons
+    Button yesbutton = new Button("Yes");
+    Button nobutton = new Button("No");
 
-        yesbutton.setOnAction(e -> {
+    yesbutton.setOnAction(e -> {
 
-            answer = true;
-            window.close();
+      answer = true;
+      window.close();
 
-        });
+    });
 
-        nobutton.setOnAction(e -> {
+    nobutton.setOnAction(e -> {
 
-            answer = false;
-            window.close();
+      answer = false;
+      window.close();
 
-        });
-
-
-        VBox layout = new VBox(10);
-        layout.getChildren().addAll(label,yesbutton,nobutton);
-        layout.setAlignment(Pos.CENTER);
-        Scene scene = new Scene(layout);
-        window.setScene(scene);
-        window.showAndWait();
-
-        return answer;
+    });
 
 
-    }
+    VBox layout = new VBox(10);
+    layout.getChildren().addAll(label,yesbutton,nobutton);
+    layout.setAlignment(Pos.CENTER);
+    Scene scene = new Scene(layout);
+    window.setScene(scene);
+    window.showAndWait();
+
+    return answer;
+
+
+  }
 
 }

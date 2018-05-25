@@ -24,17 +24,9 @@ public class Node<T> {
 	}
 
 
-<<<<<<< HEAD
 	public void AddNode(New_Node prev, New_Node succ, Integer count, New_Node tmphead){
 			New_Node tmp2 = tmphead;
-=======
-	public void setLine( Line line){
-		Integer index = 0;
-		for ( Object pd : line_list) {
-			index++;
-		}
-		line_list.add(index,line);
->>>>>>> 752ece9dd2c578e75ac118b437679475fbd24c94
+
 
 
 			if(count == 0){
@@ -207,14 +199,5 @@ public void random_graph(BorderPane layout, Integer index, Double control,Graph 
 
 	}
 
-<<<<<<< HEAD
-=======
-public Boolean ifLine(){
 
-	if(line_list.getFirst() != null) return true;
-	else return false;
-
-}
-
->>>>>>> 752ece9dd2c578e75ac118b437679475fbd24c94
 }

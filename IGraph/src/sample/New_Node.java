@@ -75,6 +75,14 @@ public class New_Node<T> {
         this.cont = cont;
     }
 
+    public void setLine(Line line) {
+        Integer index = 0;
+        for (Object pd : line_list) {
+            index++;
+        }
+        line_list.add(index, line);
+    }
+
     public void getLine(Double X,Double Y, Double OldX, Double OldY){
         Integer index = 0;
         Line line;
@@ -110,9 +118,6 @@ public class New_Node<T> {
 
     }
 
-    public void setLine(Line line) {
-        this.line_list.add(line);
-    }
 
     public New_Node<T> getHead() {
         return head;

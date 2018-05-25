@@ -32,8 +32,12 @@ public class Node<T> {
 	}
 
 
-	public void setLine(Node tmp, Line line){
-		tmp.line_list.add(line);
+	public void setLine( Line line){
+		Integer index = 0;
+		for ( Object pd : line_list) {
+			index++;
+		}
+		line_list.add(index,line);
 
 	}
 	public void getLine(Double X,Double Y, Double OldX, Double OldY){
@@ -231,7 +235,10 @@ public Double return_CenterY(Node tmp){
 }
 
 public Boolean ifLine(){
+
 	if(line_list.getFirst() != null) return true;
-	return false;
+	else return false;
+
 }
+
 }

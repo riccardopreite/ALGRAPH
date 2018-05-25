@@ -9,215 +9,138 @@ import javax.xml.crypto.dom.DOMCryptoContext;
 import java.sql.Struct;
 import java.util.*;
 
+import static javafx.scene.paint.Color.BLACK;
+
 
 public class Node<T> {
 
-	private T element;
-	private Double circleY;
-	private Double circleX;
-	private Circle circle;
-	private  int cont = 0;
-	LinkedList<Line> line_list = new LinkedList<Line>();
-	private Node<T> head;
-	private Node<T> next;
+	Integer cont = 0;
 
 
 
-	public Node(Double CircleX, Double CircleY, T element, Circle Circle) {
-		this.circleX = CircleX;
-		this.circleY = CircleY;
-		this.element = element;
-		this.circle = Circle;
+	public Node() {
+
 
 	}
 
 
-	public void setLine(Node tmp, Line line){
-		tmp.line_list.add(line);
+	public void AddNode(New_Node prev, New_Node succ, Integer count, New_Node tmphead){
+			New_Node tmp2 = tmphead;
 
-	}
-	public void getLine(Double X,Double Y, Double OldX, Double OldY){
-		Integer index = 0;
-		Line line;
-		for ( Object pd : line_list) {
-			line = line_list.get(index);
-			if((OldX.equals(line.getStartX())) && (OldY.equals(line.getStartY()))) {
-				System.out.println("START");
-				line.setStartX(X);
-				line.setStartY(Y);
+
+			if(count == 0){
+				System.out.println("Element added.");
+				tmp2.setHead(prev);
+				tmp2.setNext(null);
+				cont++;
 			}
-			 if( (OldX.equals(line.getEndX())) && (OldY.equals(line.getEndY()))) {
-				System.out.println("END");
-				line.setEndX(X);
-				line.setEndY(Y);
+			else {
+				while(tmp2.getNext() != null){
+					tmp2 = tmp2.getNext();
+				}
+				System.out.println("Element added.");
+
+				tmp2.setNext(succ);
+				tmp2 = tmp2.getNext();
+				tmp2.setNext(null);
+
 			}
-			index++;
 		}
 
+	public New_Node FindElement(Double X, Double Y,New_Node tmphead){
+		New_Node tmp2 = tmphead;
+		if(tmp2 != null) {
+			while (tmp2 != null) {
+				if (exist(X, Y, tmp2)) {
+					return tmp2;
+				}
+				tmp2 = tmp2.getNext();
 
-	}
-	public void AddNode(Node prev, Node succ, Integer count){
-		Node tmp = this.head;
-		if(count == 0){
-			this.head = prev;
-			prev.next = null;
-			cont++;
-		}
-		else {
-			while(tmp.next!=null){
-				tmp = tmp.next;
 			}
-			tmp.next = succ;
-			succ.next = null;
-		}
-	}
-
-	public T getElement() {
-
-		return this.element;
-	}
-
-	public Node FindElement(Double X, Double Y){
-		Node tmp = this.head;
-		while(tmp!=null){
-			if(exist(X, Y,tmp)){
-				return tmp;
-			}
-			tmp = tmp.next;
-
 		}
 		return null;
 	}
-	public int DeleteElement(Node toDelete, BorderPane layout,Integer count){
-		Node tmp = toDelete;
-		Node tmp2 = this.head;
+	public int DeleteElement(New_Node toDelete, BorderPane layout,Integer count,New_Node tmphead){
+		New_Node tmp = new New_Node();
+		New_Node tmp2 = new New_Node();
+		tmp = toDelete;
+		tmp2 = tmphead;
 		Integer index = 0;
-				if (tmp.equals(this.head)) {
-					if(head.next != null){
-						index = 0;
-						for ( Object pd : tmp.line_list) {
-							layout.getChildren().remove(pd);
-							tmp.line_list.set(index, null);
-							index++;
-
-						}
-						layout.getChildren().remove(tmp.circle);
-
-						head.element = null;
-						head.circleY = null;
-						head.circleX = null;
-						head.circle = null;
-						this.head = head.next;
+				if (tmp.equals(tmp2.getHead())) {
+					if(tmp.getNext() != null){
+						tmp.remove_element(layout);
+						tmp.setHead(tmp.getNext());
+						tmp.setCircle(null);
+						tmp.setCircleX(null);
+						tmp.setCircleY(null);
+						tmp.setElement(null);
 						return count--;
 						}
 					else{
-						index = 0;
-						for ( Object pd : tmp.line_list) {
-							layout.getChildren().remove(pd);
-							tmp.line_list.set(index, null);
-							index++;
+						tmp.remove_element(layout);
+						tmp.setCircle(null);
+						tmp.setCircleX(null);
+						tmp.setCircleY(null);
+						tmp.setElement(null);
+						tmp.setHead(null);
 
-						}
-						layout.getChildren().remove(tmp.circle);
-
-						head.element = null;
-						head.circleY = null;
-						head.circleX = null;
-						head.circle = null;
-						this.head = null;
 						return 0;
 					}
-
 				} else {
-					while (tmp2.next != tmp) {
-						tmp2 = tmp2.next;
+					while (tmp2.getNext() != tmp) {
+						tmp2 = tmp2.getNext();
 					}
-					index = 0;
-					for ( Object pd : tmp.line_list) {
-						layout.getChildren().remove(pd);
-						tmp.line_list.set(index, null);
-						index++;
+					tmp.remove_element(layout);
+					tmp2.setNext(tmp.getNext());
+					tmp.setElement(null);
+					tmp.setCircleY(null);
+					tmp.setCircle(null);
+					tmp.setCircleX(null);
 
-					}
-					layout.getChildren().remove(tmp.circle);
-
-					tmp2.next = tmp.next;
-					tmp.element = null;
-					tmp.circleY = null;
-					tmp.circleX = null;
-					tmp.circle = null;
 					}
 
 		return count--;
 	}
 
-	public Circle CircleToDelete(Node toDelete){
+	public Circle CircleToDelete(New_Node toDelete){
 
-		return toDelete.circle;
+		return toDelete.getCircle();
 
 	}
 
-	public void print(){
-		Node tmp = this.head;
+	public void print(New_Node tmphead){
+		New_Node tmp = tmphead;
 
 		while(tmp!=null){
-			System.out.println("X: " + tmp.circleX + " Y: " + tmp.circleY + " element: " + tmp.element);
-			tmp = tmp.next;
+			System.out.println("X: " + tmp.getCircleX() + " Y: " + tmp.getCircleY() + " element: " + tmp.getElement());
+			tmp = tmp.getNext();
 		}
 	}
 
 
 
-public boolean exist(Double X, Double Y, Node tmp) {
+public boolean exist(Double X, Double Y, New_Node tmp) {
 
-			if((X <= tmp.circleX + 20 && X >= tmp.circleX - 20) && (Y <= tmp.circleY + 20 && Y >= tmp.circleY - 20)){
+			if((X <= tmp.getCircleX() + 17 && X >= tmp.getCircleX() - 17) && (Y <= tmp.getCircleY() + 17 && Y >= tmp.getCircleY() - 17)){
 				System.out.println("Element Found!\n Exit.");
 				return true;
 				}
-			System.out.println("Element not Found!");
 			return false;
 
 
 }
 
-public void ChangeCoordinates(Double x,Double y){
-	circleY = y;
-	circleX = x;
-	circle.setCenterX(x);
-	circle.setCenterY(y);
-}
-
-
-public Double return_CenterX(Node tmp){
-		return tmp.circleX;
-
-}
-
-public Double return_CenterY(Node tmp){
-
-	return tmp.circleY;
-
-	}
-
-
-	public BorderPane clearLayout(BorderPane layout){
-		Node tmp = head;
-		Integer index = 0;
+	public BorderPane clearLayout(BorderPane layout,New_Node tmphead){
+		New_Node tmp;
+		tmp = tmphead;
 
 		while(tmp != null){
-			index = 0;
-			for ( Object pd : tmp.line_list) {
-				layout.getChildren().remove(pd);
-				tmp.line_list.set(index, null);
-				index++;
-
-			}
-			layout.getChildren().remove(tmp.circle);
-			tmp.element = null;
-			tmp.circleY = null;
-			tmp.circleX = null;
-			tmp.circle = null;
-			tmp = tmp.next;
+			tmp.remove_element(layout);
+			tmp.setElement(null);
+			tmp.setCircleX(null);
+			tmp.setCircleY(null);
+			tmp.setCircle(null);
+			tmp = tmp.getNext();
 
 		}
 		this.cont = 0;
@@ -225,13 +148,54 @@ public Double return_CenterY(Node tmp){
 	}
 
 
-	public String toString() {
 
-	return this.circleX.toString();
-}
+public void random_graph(BorderPane layout, Integer index, Double control,Graph graph,New_Node tmphead){
+		New_Node tmp, tmp2;
+		tmp = tmphead;
+		tmp2 = tmphead;
+		Double probability;
+		Integer aux = 0;
+		Line line2;
 
-public Boolean ifLine(){
-	if(line_list.getFirst() != null) return true;
-	return false;
-}
+	if(aux != index) {
+			while (aux < index) {
+				tmp2 = tmp2.getNext();
+				aux++;
+			}
+		}
+		while(tmp != null) {
+			probability = (Double) Math.random() * 99 + 1;
+
+			if (probability <= control) {
+				//add line
+				if(!tmp.equals(tmp2)){
+					line2 = new Line();
+					line2.setEndX(tmp.getCircleX());
+					line2.setEndY(tmp.getCircleY());
+             		line2.setStartX(tmp2.getCircleX());
+					line2.setStartY(tmp2.getCircleY());
+					tmp2.setLine(line2);
+					tmp.setLine(line2);
+				    layout.getChildren().add(line2);
+				    System.out.println();
+					graph.insertEdge(tmp2, tmp);
+				}
+
+			}
+			tmp = tmp.getNext();
+		}
+	}
+
+	public void rePrint_Circle(New_Node tmphead){
+
+		New_Node tmp = tmphead;
+		while(tmp != null){
+
+			tmp.getCircle().setFill(BLACK);
+			tmp = tmp.getNext();
+
+		}
+
+	}
+
 }

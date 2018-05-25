@@ -2,6 +2,10 @@ package sample;
 
 import com.sun.org.apache.bcel.internal.generic.MONITORENTER;
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -9,6 +13,8 @@ import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -16,329 +22,260 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.LineBuilder;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import jdk.internal.cmm.SystemResourcePressureImpl;
 
+import java.awt.*;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static javafx.scene.paint.Color.BLACK;
+import static javafx.scene.paint.Color.BLUE;
 
 
 public class Main extends Application {
-  Boolean edge1 = false, edge2= false, removed = false, add = false;
+  Boolean edge1 = false, edge2= false, removed = false, add = false,move = false;
   Double startLineX, startLineY, endLineX, endLineY, LinX, LinY;
   Scene scene1, scene2;
-  Stage window;
+  Stage window, window2;
   BorderPane layout, layout2;
   Circle circle;
-  Line line, tmpline;
+  Line line;
   Integer cont_node=0, count = 0;
   Node node;
-  Node pd = null,pd2;
+  New_Node pd = null,pd2;
   Node head = null;
-  Node node2;
-  public Node drag;
+  New_Node tmphead = null,tmpnode = null;
+  public New_Node drag;
+
   Graph graph = new Graph();
+  TextField nameinput;
+  TextField priceinput;
+  TextField quantityinput;
+  TableView table;
+  Stage secondStage;
+  VBox vbox;
+  private Desktop desktop = Desktop.getDesktop();
+
 
   @Override
   public void start(Stage primaryStage) throws Exception {
-      layout2 = new BorderPane();
+    layout2 = new BorderPane();
 
 
-      window = primaryStage;
-      window.setTitle("making Menux");
 
-      //File menu
+    window = primaryStage;
+    window.setTitle("making Menux");
 
-
-      Menu filemenu = new Menu("File");
-      window.setOnCloseRequest(e -> {
-
-          e.consume();
-          closeProgram();
-      });
+    //File menu
 
 
-      MenuItem newfile = new MenuItem("New");
-      newfile.setOnAction(e -> {
-          if (cont_node > 0) {
-              layout2 = head.clearLayout(layout2);
-          }
+    Menu filemenu = new Menu("File");
+    window.setOnCloseRequest(e -> {
 
-          window.setScene(scene2);
-
-      });
-
-      MenuItem openfile = new MenuItem("Open");
-      openfile.setOnAction(e -> {
-          if (cont_node > 0) {
-              layout2 = head.clearLayout(layout2);
-
-          }
-          window.setScene(scene2);
-          Openfile();
-      });
+      e.consume();
+      closeProgram();
+    });
 
 
-      MenuItem randomfile = new MenuItem("Generate random");
-      randomfile.setOnAction(e -> {
-          if (cont_node > 0) {
-              layout2 = head.clearLayout(layout2);
+    MenuItem newfile = new MenuItem("New");
+    newfile.setOnAction(e -> {
+      if(cont_node > 0){
+        layout2 = head.clearLayout(layout2,tmphead);
+
+      }
+      if(secondStage != null) {
+        secondStage.close();
+      }
+      set_View();
+      cont_node = 0;
+      count = 0;
+      line = null;
+      edge1 = false;
+      edge2 = false;
+      removed = false;
+      add = false;
+      move = false;
+      head = null;
+      graph = new Graph();
 
 
-          }
-          window.setScene(scene2);
-      });
+      window.setScene(scene2);
+
+    });
+
+    MenuItem openfile = new MenuItem("Open");
+    openfile.setOnAction(e -> {
+      if(cont_node > 0){
+        layout2 = head.clearLayout(layout2,tmphead);
+
+      }
+      if(secondStage != null) {
+        secondStage.close();
+      }
+      set_View();
+      cont_node = 0;
+      count = 0;
+      line = null;
+      edge1 = false;
+      edge2 = false;
+      removed = false;
+      add = false;
+      move = false;
+      head = null;
+      graph = new Graph();
+
+      Openfile();
+      window.setScene(scene2);
+
+    });
 
 
-      MenuItem exitfile = new MenuItem("Exit");
-      exitfile.setOnAction(e -> {
+    MenuItem randomfile = new MenuItem("Generate random");
+    randomfile.setOnAction(e -> {
+      if(cont_node > 0){
+        layout2 = head.clearLayout(layout2,tmphead);
 
-          e.consume();
-          closeProgram();
-      });
+      }
+      if(secondStage != null) {
+        secondStage.close();
+      }
 
+      cont_node = 0;
+      count = 0;
+      line = null;
+      edge1 = false;
+      edge2 = false;
+      removed = false;
+      add = false;
+      move = false;
+      head = null;
+      graph = new Graph();
+      set_View();
+      Create_rand_Graph(20,table);
 
-      filemenu.getItems().addAll(newfile, openfile, randomfile, exitfile);
-
-      //Edit menu
-      Menu editmenu = new Menu("Edit");
-      MenuItem Deletenode = new MenuItem("Delete Node");
-      Deletenode.setOnAction(e -> {
-          this.removed = true;
-
-          EventHandler<MouseEvent> delete = mouseEvent -> removed = Removenode(mouseEvent, removed);
-          layout2.addEventHandler(MouseEvent.MOUSE_PRESSED, delete);
-      });
-
-      MenuItem Addnode = new MenuItem("Add Node");
-      Addnode.setOnAction(e -> {
-          this.add = true;
-          EventHandler<MouseEvent> AddNode = mouseEvent -> this.add = addCircle(mouseEvent, add);
-          layout2.addEventHandler(MouseEvent.MOUSE_PRESSED, AddNode);
-
-
-      });
-
-      MenuItem Startedge = new MenuItem("Choose Start Node");
-      Startedge.setOnAction(e -> {
-          this.edge1 = true;
-          EventHandler<MouseEvent> open = mouseEvent -> this.pd = AddStart(mouseEvent, pd, this.edge1);
-          layout2.addEventHandler(MouseEvent.MOUSE_PRESSED, open);
-          System.out.println(pd);
-
-      });
-
-      MenuItem EndEdge = new MenuItem("Choose End Node");
-      EndEdge.setOnAction(e -> {
-          this.edge2 = true;
-          System.out.println("Start: " + pd);
-          EventHandler<MouseEvent> end = mouseEvent2 -> AddEnd(mouseEvent2, pd, this.edge2);
-          layout2.addEventHandler(MouseEvent.MOUSE_PRESSED, end);
-
-      });
+      window.setScene(scene2);
+    });
 
 
-      editmenu.getItems().addAll(Addnode, Startedge, EndEdge, Deletenode);
+    MenuItem exitfile = new MenuItem("Exit");
+    exitfile.setOnAction(e -> {
+
+      e.consume();
+      closeProgram();
+    });
 
 
-      //Help menu
-      Menu helpmenu = new Menu("Help");
-      CheckMenuItem showlinenumbers = new CheckMenuItem("Show line numbers");
-      helpmenu.getItems().addAll(showlinenumbers);
+    EventHandler<MouseEvent> select = mouseEvent -> {
+      New_Node selected;
+      if(head != null) {
+        if ((selected = head.FindElement(mouseEvent.getX(), mouseEvent.getY(), tmphead)) != null) {
+
+          circle = selected.getCircle();
+          circle.setFill(BLUE);
+
+        }
+        else{
+          head.rePrint_Circle(tmphead);
+        }
+      }
+
+    };
+    layout2.addEventHandler(MouseEvent.MOUSE_MOVED, select);
+
+    filemenu.getItems().addAll(newfile, openfile, randomfile, exitfile);
+
+    //Edit menu
+    Menu editmenu = new Menu("Edit");
+    MenuItem Deletenode = new MenuItem("Delete Node");
+    Deletenode.setOnAction(e -> {
+      this.removed = true;
+
+      EventHandler<MouseEvent> delete = mouseEvent -> removed = Removenode(mouseEvent, removed);
+      layout2.addEventHandler(MouseEvent.MOUSE_PRESSED, delete);
+
+    });
+
+    MenuItem Addnode = new MenuItem("Add Node");
+    Addnode.setOnAction(e -> {
+      this.add = true;
+      EventHandler<MouseEvent> AddNode = mouseEvent -> this.add = addCircle(mouseEvent, add);
+      layout2.addEventHandler(MouseEvent.MOUSE_PRESSED, AddNode);
 
 
-      //Main menu bar
-      MenuBar menuBar = new MenuBar();
-      MenuBar menuBar2 = new MenuBar();
-      menuBar.getMenus().addAll(filemenu, editmenu, helpmenu);
-      menuBar2.getMenus().addAll(filemenu, editmenu, helpmenu);
+    });
+
+    MenuItem Startedge = new MenuItem("Choose Start Node");
+    Startedge.setOnAction(e -> {
+      this.edge1 = true;
+      EventHandler<MouseEvent> open = mouseEvent -> this.pd = AddStart(mouseEvent, pd, this.edge1);
+      layout2.addEventHandler(MouseEvent.MOUSE_PRESSED, open);
+
+    });
+
+    MenuItem EndEdge = new MenuItem("Choose End Node");
+    EndEdge.setOnAction(e -> {
+      this.edge2 = true;
+      EventHandler<MouseEvent> end = mouseEvent2 -> AddEnd(mouseEvent2, pd, this.edge2);
+      layout2.addEventHandler(MouseEvent.MOUSE_PRESSED, end);
+
+    });
+
+    MenuItem MoveNode = new MenuItem("Move The Node");
+    MoveNode.setOnAction(e -> {
+      move = true;
+      move = MoveCircle(move);
+
+    });
 
 
-      //EDGE
+
+    editmenu.getItems().addAll(Addnode, Startedge, EndEdge, Deletenode,MoveNode);
 
 
-      layout2.setTop(menuBar2);
-      layout2.getChildren().addAll();
+    //Help menu
+    Menu helpmenu = new Menu("Help");
+    MenuItem Help = new MenuItem("Show Help Menu");
+    Help.setOnAction(e -> {
 
-      scene2 = new Scene(layout2, 1200, 900);
-      layout = new BorderPane();
-      layout.setTop(menuBar);
-      scene1 = new Scene(layout, 200, 250);
+    });
+    helpmenu.getItems().addAll(Help);
 
-          layout2.setOnMousePressed(new EventHandler<MouseEvent>() {
-              @Override
-              public void handle(MouseEvent event) {
-                  Node delete = null;
-                  System.out.println("ciao");
-                  if (event.getButton() == MouseButton.PRIMARY) {
-                      if (head == null)
-                          delete = null;
-                      else delete = head.FindElement(event.getX(), event.getY());
-                  }
-                  drag = delete;
-                  LinX = drag.return_CenterX(drag);
-                  LinY = drag.return_CenterY(drag);
 
-              }
-          });
+    //Main menu bar
+    MenuBar menuBar = new MenuBar();
+    MenuBar menuBar2 = new MenuBar();
+    menuBar.getMenus().addAll(filemenu, editmenu, helpmenu);
+    menuBar2.getMenus().addAll(filemenu, editmenu, helpmenu);
 
-          layout2.setOnMouseDragged(new EventHandler<MouseEvent>() {
-              @Override
-              public void handle(MouseEvent event) {
-                  if (drag == null) return;
-                  if (event.getY() < 44) {
-                      if (event.getX() > 1180) {
-                          drag.ChangeCoordinates(1180.0, 49.0);
-                          if(drag.ifLine()) {
-                              drag.getLine(event.getX(), event.getY(), LinX, LinY);
-                              drag = head.FindElement(event.getX(), event.getY());
-                              LinX = drag.return_CenterX(drag);
-                              LinY = drag.return_CenterY(drag);
-                          }
 
-                      } else if (event.getX() < 20) {
-                          drag.ChangeCoordinates(21.0, 49.0);
-                          if(drag.ifLine()) {
-                              drag.getLine(event.getX(), event.getY(), LinX, LinY);
-                              drag = head.FindElement(event.getX(), event.getY());
-                              LinX = drag.return_CenterX(drag);
-                              LinY = drag.return_CenterY(drag);
-                          }
+    //EDGE
 
-                      } else {
-                          drag.ChangeCoordinates(event.getX(), 49.0);
-                          if(drag.ifLine() == true) {
-                              drag.getLine(event.getX(), event.getY(), LinX, LinY);
-                              drag = head.FindElement(event.getX(), event.getY());
-                              LinX = drag.return_CenterX(drag);
-                              LinY = drag.return_CenterY(drag);
-                          }
 
-                      }
-                      return;
-                  } else if (event.getY() > 880) {
-                      if (event.getX() > 1180) {
-                          drag.ChangeCoordinates(1180.0, 880.0);
-                          if(drag.ifLine()) {
-                              drag.getLine(event.getX(), event.getY(), LinX, LinY);
-                              drag = head.FindElement(event.getX(), event.getY());
-                              LinX = drag.return_CenterX(drag);
-                              LinY = drag.return_CenterY(drag);
-                          }
+    layout2.setTop(menuBar2);
+    layout2.getChildren().addAll();
 
-                      } else if (event.getX() < 20) {
-                          drag.ChangeCoordinates(21.0, 880.0);
-                          if(drag.ifLine()) {
-                              drag.getLine(event.getX(), event.getY(), LinX, LinY);
-                              drag = head.FindElement(event.getX(), event.getY());
-                              LinX = drag.return_CenterX(drag);
-                              LinY = drag.return_CenterY(drag);
-                          }
-
-                      } else {
-                          drag.ChangeCoordinates(event.getX(), 880.0);
-                          if(drag.ifLine()) {
-                              drag.getLine(event.getX(), event.getY(), LinX, LinY);
-                              drag = head.FindElement(event.getX(), event.getY());
-                              LinX = drag.return_CenterX(drag);
-                              LinY = drag.return_CenterY(drag);
-                          }
-
-                      }
-                      return;
-                  }
-                  if (event.getX() < 20) {
-                      if (event.getY() < 44) {
-                          drag.ChangeCoordinates(20.0, 49.0);
-                          if(drag.ifLine()) {
-                              drag.getLine(event.getX(), event.getY(), LinX, LinY);
-                              drag = head.FindElement(event.getX(), event.getY());
-                              LinX = drag.return_CenterX(drag);
-                              LinY = drag.return_CenterY(drag);
-                          }
-                      } else if (event.getY() > 880) {
-                          drag.ChangeCoordinates(20.0, 880.0);
-                          if(drag.ifLine()) {
-                              drag.getLine(event.getX(), event.getY(), LinX, LinY);
-                              drag = head.FindElement(event.getX(), event.getY());
-                              LinX = drag.return_CenterX(drag);
-                              LinY = drag.return_CenterY(drag);
-                          }
-                      } else {
-                          drag.ChangeCoordinates(20.0, event.getY());
-                          if(drag.ifLine()) {
-                              drag.getLine(event.getX(), event.getY(), LinX, LinY);
-                              drag = head.FindElement(event.getX(), event.getY());
-                              LinX = drag.return_CenterX(drag);
-                              LinY = drag.return_CenterY(drag);
-                          }
-
-                      }
-
-                      return;
-                  } else if (event.getX() > 1180) {
-                      if (event.getY() < 44) {
-                          drag.ChangeCoordinates(1180.0, 49.0);
-                          if(drag.ifLine()) {
-                              drag.getLine(event.getX(), event.getY(), LinX, LinY);
-                              drag = head.FindElement(event.getX(), event.getY());
-                              LinX = drag.return_CenterX(drag);
-                              LinY = drag.return_CenterY(drag);
-                          }
-
-                      } else if (event.getY() > 880) {
-                          drag.ChangeCoordinates(1180.0, 880.0);
-                          if(drag.ifLine()) {
-                              drag.getLine(event.getX(), event.getY(), LinX, LinY);
-                              drag = head.FindElement(event.getX(), event.getY());
-                              LinX = drag.return_CenterX(drag);
-                              LinY = drag.return_CenterY(drag);
-                          }
-
-                      } else {
-                          drag.ChangeCoordinates(1180.0, event.getY());
-                          if(drag.ifLine()) {
-                              drag.getLine(event.getX(), event.getY(), LinX, LinY);
-                              drag = head.FindElement(event.getX(), event.getY());
-                              LinX = drag.return_CenterX(drag);
-                              LinY = drag.return_CenterY(drag);
-                          }
-                      }
-                      return;
-
-                  } else {
-                      drag.ChangeCoordinates(event.getX(), event.getY());
-                      if(drag.ifLine()) {
-                          drag.getLine(event.getX(), event.getY(), LinX, LinY);
-                          drag = head.FindElement(event.getX(), event.getY());
-                          LinX = drag.return_CenterX(drag);
-                          LinY = drag.return_CenterY(drag);
-                      }
-
-                  }
-              }
-
-          });
-          layout2.setOnMouseClicked(new EventHandler<MouseEvent>() {
-              @Override
-              public void handle(MouseEvent event) {
-                  drag = null;
-              }
-          });
+    scene2 = new Scene(layout2, 1200, 900);
+    layout = new BorderPane();
+    layout.setTop(menuBar);
+    scene1 = new Scene(layout, 200, 250);
 
     window.setScene(scene1);
     window.show();
     window.setX(200);
     window.setY(200);
   }
-
-  public void Openfile(){
-
-    File file;
-    file = new File("data.txt");
+  private void openFile(File file) {
     URL path = null;
+
     try {
+      desktop.open(file);
+
       path = file.toURL();
       InputStream is = path.openStream();
       BufferedReader br=new BufferedReader(new InputStreamReader(is));
@@ -363,6 +300,24 @@ public class Main extends Application {
 
   }
 
+  public void Openfile() {
+    Stage stage = new Stage();
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Open Txt File");
+    fileChooser.setInitialDirectory(
+            new File(System.getProperty("user.home"))
+    );
+
+    fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Txt", ".txt")
+    );
+    File file = fileChooser.showOpenDialog(stage);
+    if (file != null) {
+      openFile(file);
+    }
+
+  }
+
   private void closeProgram() {
     Boolean answer = ConfirmBox.display("Fuck God!!!", "Are you sure you want to exit?");
 
@@ -372,17 +327,16 @@ public class Main extends Application {
     }
   }
   public Boolean addCircle(MouseEvent mouseEvent, Boolean add){
-    List Start, Finish;
     if(!add){
-       // this.edge1 = false;
-       // this.edge2 = false;
-       // this.removed = false;
+      // this.edge1 = false;
+      // this.edge2 = false;
+      // this.removed = false;
       return false;
     }
     else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-       // this.edge1 = false;
-       // this.edge2 = false;
-       // this.removed = false;
+      // this.edge1 = false;
+      // this.edge2 = false;
+      // this.removed = false;
 
       if(mouseEvent.getY() < 45) {
         System.out.println("Non va bene porcodio");
@@ -409,27 +363,40 @@ public class Main extends Application {
       }else {
         circle = new Circle(mouseEvent.getX(), mouseEvent.getY(), 20);
       }
+      New_Node tmp2 = new New_Node();
       if (this.count == 0) {
+        head = null;
+        head = new Node();
+        tmphead = new New_Node();
+        tmphead.setCircleX(mouseEvent.getX());
+        tmphead.setCircleY(mouseEvent.getY());
+        tmphead.setCircle(circle);
+        graph.insertNode(tmphead);
+        head.AddNode(tmphead, null, count, tmphead);
 
-        head = new Node(mouseEvent.getX(), mouseEvent.getY(), cont_node, circle);
-        graph.insertNode(head);
-        node2 = head;
-        head.AddNode(head, null, count);
+        tmp2 = tmphead;
 
 
         layout2.getChildren().addAll(circle);
         this.cont_node++;
         this.count++;
+        this.move = false;
       } else {
-        node = new Node(mouseEvent.getX(), mouseEvent.getY(), cont_node, circle);
-        graph.insertNode(node);
+        node = new Node();
+        tmpnode = new New_Node();
+        tmpnode.setCircleX(mouseEvent.getX());
+        tmpnode.setCircleY(mouseEvent.getY());
+        tmpnode.setCircle(circle);
+        graph.insertNode(tmpnode);
 
-        head.AddNode(node2, node,count);
-        node2 = node;
+        head.AddNode(tmp2, tmpnode,count,tmphead);
+        tmp2 = tmpnode;
 
         layout2.getChildren().addAll(circle);
         this.cont_node++;
         this.count++;
+        this.move = false;
+
 
 
       }
@@ -440,27 +407,28 @@ public class Main extends Application {
 
 
   public Boolean Removenode(MouseEvent mouseEvent, Boolean removed){
-    Node delete;
+    New_Node delete;
     if(removed) {
       //  this.edge1 = false;
-       // this.edge2 = false;
+      // this.edge2 = false;
       //  this.add = false;
-        if(count == 0) {
-            return false;
-        }
+      if(count == 0) {
+        return false;
+      }
 
-        if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-        delete = head.FindElement(mouseEvent.getX(), mouseEvent.getY());
+      if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+        delete = head.FindElement(mouseEvent.getX(), mouseEvent.getY(),tmphead);
 
 
         if (delete != null) {
           circle = head.CircleToDelete(delete);
-          this.count = head.DeleteElement(delete, this.layout2,count);
+          this.count = head.DeleteElement(delete, this.layout2,count,tmphead);
           graph.deleteNode(delete);
           System.out.println("Element Deleted.");
-          // graph.print();
+          graph.print();
         }
-        head.print();
+        head.print(tmphead);
+        this.move = false;
 
       }
       else return false;
@@ -470,72 +438,78 @@ public class Main extends Application {
 
   }
 
-  public Node AddStart(MouseEvent mouseEvent, Node start, Boolean Edge1){
+  public New_Node AddStart(MouseEvent mouseEvent, New_Node start, Boolean Edge1){
     if(!Edge1){
-        return  start;
+      return  start;
     }
 
     else if(Edge1) {
-     //   this.edge2 = false;
+      //   this.edge2 = false;
       //  this.removed = false;
       //  this.add = false;
-        if(count < 2) {
-            System.out.println("poecodio minore di due start");
-            return null;
-        }
-        else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+      if(count < 2) {
+        System.out.println("poecodio minore di due start");
+        return null;
+      }
+      else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
 
-        start = head.FindElement(mouseEvent.getX(), mouseEvent.getY());
-        this.startLineX = head.return_CenterX(start);
-        this.startLineY = head.return_CenterY(start);
+        start = head.FindElement(mouseEvent.getX(), mouseEvent.getY(),tmphead);
+        this.startLineX = mouseEvent.getX();
+        this.startLineY = mouseEvent.getY();
 
-          System.out.println(edge1);
         this.edge1 = false;
+        this.move = false;
+
+        return start;
 
 
       }
-      else this.edge1 = false;
+      else {
+        this.move = false;
+        this.edge1 = false;
+      }
 
 
     }
+    this.move = false;
     return start;
 
   }
 
-  public void AddEnd(MouseEvent mouseEvent2, Node start, Boolean Edge2) {
+  public void AddEnd(MouseEvent mouseEvent2, New_Node start, Boolean Edge2) {
 
-    Node finish = null;
+    New_Node finish = null;
 
     if(Edge2) {
-        //this.edge1 = false;
+      //this.edge1 = false;
       //  this.removed = false;
-       // this.add = false;
-        if(count < 2) {
-            System.out.println("poecodio minore di due finish");
-            return;
-        }
-        else if (mouseEvent2.getButton() == MouseButton.PRIMARY) {
+      // this.add = false;
+      if(count < 2) {
+        System.out.println("poecodio minore di due finish");
+        this.move = false;
+        return;
+      }
+      else if (mouseEvent2.getButton() == MouseButton.PRIMARY) {
 
-        finish = head.FindElement(mouseEvent2.getX(), mouseEvent2.getY());
-          this.endLineX = head.return_CenterX(finish);
-          this.endLineY = head.return_CenterY(finish);
-          line = new Line();
-          line.setStartX(this.startLineX);
-          line.setStartY(this.startLineY);
-          line.setEndX(endLineX);
-          line.setEndY(endLineY);
+        finish = head.FindElement(mouseEvent2.getX(), mouseEvent2.getY(),tmphead);
+        line = new Line();
+        line.setStartX(start.getCircleX());
+        line.setStartY(start.getCircleY());
+        line.setEndX(finish.getCircleX());
+        line.setEndY(finish.getCircleY());
 
-      //    System.out.println("Startx: " + this.startLineX + " Starty: " + this.startLineY + " Endx: " + endLineX + " Endy: " + endLineY  );
-          head.setLine(start,line);
-          head.setLine(finish, line);
-          layout2.getChildren().addAll(line);
+        //    System.out.println("Startx: " + this.startLineX + " Starty: " + this.startLineY + " Endx: " + endLineX + " Endy: " + endLineY  );
+        start.setLine(line);
+        finish.setLine(line);
+        layout2.getChildren().addAll(line);
 
-          graph.insertEdge(start, finish);
+        graph.insertEdge(start, finish);
+        //   this.pd = null;
 
         this.edge2 = false;
+        this.move = false;
 
         graph.print();
-        start = null;
       }
       else this.edge2 = false;
 
@@ -543,6 +517,342 @@ public class Main extends Application {
     }
 
   }
+
+  public Boolean MoveCircle(Boolean move){
+
+    if(move) {
+      move = false;
+      layout2.setOnMousePressed(new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent event) {
+          New_Node delete = null;
+          System.out.println("ciao");
+          if (event.getButton() == MouseButton.PRIMARY) {
+            if (head == null)
+            drag = null;
+            else {
+              drag = head.FindElement(event.getX(), event.getY(), tmphead);
+              if (drag != null) {
+                LinX = drag.getCircleX();
+                LinY = drag.getCircleY();
+              }
+            }
+          }
+
+
+        }
+      });
+
+      layout2.setOnMouseDragged(new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent event) {
+          if (drag == null) return;
+          if (event.getY() < 44) {
+            if (event.getX() > 1180) {
+              drag.getLine(1180.0, 49.0, LinX, LinY);
+              drag.ChangeCoordinates(1180.0, 49.0);
+              //  if(drag.ifLine()) {
+              // drag = head.FindElement(event.getX(), event.getY());
+              LinX = drag.getCircleX();
+              LinY = drag.getCircleY();
+              //  }
+
+            } else if (event.getX() < 20) {
+              drag.getLine(21.0, 49.0, LinX, LinY);
+
+              drag.ChangeCoordinates(21.0, 49.0);
+              //   if(drag.ifLine()) {
+              //   drag = head.FindElement(event.getX(), event.getY());
+              LinX = drag.getCircleX();
+              LinY = drag.getCircleY();
+              //  }
+
+            } else {
+              drag.getLine(event.getX(), 49.0, LinX, LinY);
+
+              drag.ChangeCoordinates(event.getX(), 49.0);
+              //   if(drag.ifLine() == true) {
+              // drag = head.FindElement(event.getX(), event.getY());
+              LinX = drag.getCircleX();
+              LinY = drag.getCircleY();
+              //  }
+
+            }
+            return;
+          } else if (event.getY() > 880) {
+            if (event.getX() > 1180) {
+              drag.getLine(1180.0, 880.0, LinX, LinY);
+
+              drag.ChangeCoordinates(1180.0, 880.0);
+              //  if(drag.ifLine()) {
+              //  drag = head.FindElement(event.getX(), event.getY());
+              LinX = drag.getCircleX();
+              LinY = drag.getCircleY();
+              //   }
+
+            } else if (event.getX() < 20) {
+              // if(drag.ifLine()) {
+              drag.getLine(21.0, 880.0, LinX, LinY);
+              drag.ChangeCoordinates(21.0, 880.0);
+
+              //  drag = head.FindElement(event.getX(), event.getY());
+              LinX = drag.getCircleX();
+              LinY = drag.getCircleY();
+              // }
+
+            } else {
+              //  if(drag.ifLine()) {
+              drag.getLine(event.getX(), 880.0, LinX, LinY);
+              drag.ChangeCoordinates(event.getX(), 880.0);
+
+              // drag = head.FindElement(event.getX(), event.getY());
+              LinX = drag.getCircleX();
+              LinY = drag.getCircleY();
+              //  }
+
+            }
+            return;
+          }
+          if (event.getX() < 20) {
+            if (event.getY() < 44) {
+              //  if(drag.ifLine()) {
+              drag.getLine(20.0, 49.0, LinX, LinY);
+              drag.ChangeCoordinates(20.0, 49.0);
+
+              //  drag = head.FindElement(event.getX(), event.getY());
+              LinX = drag.getCircleX();
+              LinY = drag.getCircleY();
+              // }
+            } else if (event.getY() > 880) {
+              //   if(drag.ifLine()) {
+              drag.getLine(20.0, 880.0, LinX, LinY);
+              drag.ChangeCoordinates(20.0, 880.0);
+
+              //  drag = head.FindElement(event.getX(), event.getY());
+              LinX = drag.getCircleX();
+              LinY = drag.getCircleY();
+              //  }
+            } else {
+              //           if(drag.ifLine()) {
+              drag.getLine(20.0, event.getY(), LinX, LinY);
+              drag.ChangeCoordinates(20.0, event.getY());
+
+              //  drag = head.FindElement(event.getX(), event.getY());
+              LinX = drag.getCircleX();
+              LinY = drag.getCircleY();
+              //       }
+
+            }
+
+            return;
+          } else if (event.getX() > 1180) {
+            if (event.getY() < 44) {
+              //      if(drag.ifLine()) {
+              drag.getLine(1180.0, 49.0, LinX, LinY);
+              drag.ChangeCoordinates(1180.0, 49.0);
+
+              // drag = head.FindElement(event.getX(), event.getY());
+              LinX = drag.getCircleX();
+              LinY = drag.getCircleY();
+              //   }
+
+            } else if (event.getY() > 880) {
+              //    if(drag.ifLine()) {
+              drag.getLine(1180.0, 880.0, LinX, LinY);
+              drag.ChangeCoordinates(1180.0, 880.0);
+
+              //   drag = head.FindElement(event.getX(), event.getY());
+              LinX = drag.getCircleX();
+              LinY = drag.getCircleY();
+              //   }
+
+            } else {
+              //   if(drag.ifLine()) {
+              drag.getLine(1180.0, event.getY(), LinX, LinY);
+              drag.ChangeCoordinates(1180.0, event.getY());
+
+              //   drag = head.FindElement(event.getX(), event.getY());
+              LinX = drag.getCircleX();
+              LinY = drag.getCircleY();
+              //  }
+            }
+            return;
+
+          } else {
+            //    if(drag.ifLine()) {
+            drag.getLine(event.getX(), event.getY(), LinX, LinY);
+            drag.ChangeCoordinates(event.getX(), event.getY());
+
+            // drag = head.FindElement(event.getX(), event.getY());
+            LinX = drag.getCircleX();
+            LinY = drag.getCircleY();
+            //    }
+
+          }
+        }
+
+      });
+      layout2.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent event) {
+          drag = null;
+        }
+      });
+    }
+    return move;
+  }
+
+  public void Create_rand_Graph(Integer vertex, TableView table) {
+
+    Double randX, randY;
+    Integer index = 0;
+    if(vertex != 0){
+      while (index < vertex) {
+        randX = (double) (Math.random() * 1180 + 20);
+        randY = (double) (Math.random() * 831 + 49);
+
+        circle = new Circle(randX, randY, 20);
+        New_Node tmp2 = new New_Node();
+        if (this.count == 0) {
+          head = null;
+          head = new Node();
+          tmphead = new New_Node();
+          tmphead.setCircleX(randX);
+          tmphead.setCircleY(randY);
+          tmphead.setCircle(circle);
+          graph.insertNode(tmphead);
+
+
+          //ObservableList<New_Node> nodes = FXCollections.observableArrayList();
+          // nodes.add(new New_Node("A",10.0,10.0));
+          // nodes.add(new New_Node("B",randX,randY));
+
+          //   tmphead.setElement("A");
+          //  tmphead.setPrice(Double.parseDouble(priceinput.getText()));
+          //   product.setQuantity(Integer.parseInt(quantityinput.getText()));
+
+          //  table.setItems(nodes);
+          table.getItems().add(head);
+
+          head.AddNode(tmphead, null, count, tmphead);
+
+          tmp2 = tmphead;
+
+
+          layout2.getChildren().addAll(circle);
+          this.cont_node++;
+          this.count++;
+          this.move = false;
+          index++;
+
+        } else {
+          tmpnode = new New_Node();
+          tmpnode.setCircleX(randX);
+          tmpnode.setCircleY(randY);
+          tmpnode.setCircle(circle);
+          graph.insertNode(tmpnode);
+          head.AddNode(tmp2, tmpnode,count,tmphead);
+          tmp2 = tmpnode;
+
+          layout2.getChildren().addAll(circle);
+          this.cont_node++;
+          this.count++;
+          this.move = false;
+          index++;
+
+
+        }
+
+
+      }
+
+
+      index = 0;
+      Double control = 100 - (vertex * 4.75);
+      while(index < vertex){
+        head.random_graph(layout2,index, control,graph,tmphead);
+        index++;
+
+      }
+      Scene scene3 = new Scene(vbox);
+      secondStage = new Stage();
+      secondStage.setScene(scene3);
+      secondStage.show();
+
+    }
+
+
+  }
+  public void set_View() {
+    TableColumn<New_Node, String> namecolumn = new TableColumn<>("Name");
+    namecolumn.setMinWidth(100);
+    namecolumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+    //Price column
+    TableColumn<New_Node, String> pricecolumn = new TableColumn<>("Price");
+    pricecolumn.setMinWidth(100);
+    pricecolumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+
+    //Quantity column
+    TableColumn<New_Node, String> quantitycolumn = new TableColumn<>("Quantity");
+    quantitycolumn.setMinWidth(100);
+    quantitycolumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+
+
+    Button addbutton = new Button("Add");
+    addbutton.setOnAction(e -> {
+      this.add = true;
+      tmpnode = new New_Node();
+      tmpnode.setElement(nameinput.getText());
+      tmpnode.setCircleX(Double.parseDouble(priceinput.getText()));
+      tmpnode.setCircleY(Double.parseDouble(quantityinput.getText()));
+
+      table.getItems().add(tmpnode);
+      nameinput.clear();
+      priceinput.clear();
+      quantityinput.clear();
+      EventHandler<MouseEvent> AddNode = mouseEvent -> this.add = addCircle(mouseEvent, add);
+      layout2.addEventHandler(MouseEvent.MOUSE_PRESSED, AddNode);
+
+    });
+    Button deletebutton = new Button("Delete");
+    deletebutton.setOnAction(e -> {
+      this.removed = true;
+
+      EventHandler<MouseEvent> delete = mouseEvent -> removed = Removenode(mouseEvent, removed);
+      layout2.addEventHandler(MouseEvent.MOUSE_PRESSED, delete);
+
+    });
+
+
+    //Name input
+    nameinput = new TextField();
+    nameinput.setPromptText("Name");
+    nameinput.setMinWidth(100);
+
+    //Price Input
+    priceinput = new TextField();
+    priceinput.setPromptText("Price");
+
+    //Quantity Input
+    quantityinput = new TextField();
+    quantityinput.setPromptText("Quantity");
+    HBox hbox = new HBox();
+
+    hbox.setPadding(new Insets(10, 10, 10, 10));
+    hbox.setSpacing(10);
+    hbox.getChildren().addAll(nameinput, priceinput, quantityinput, addbutton, deletebutton);
+
+
+    table = new TableView();
+    table.getColumns().addAll(namecolumn, pricecolumn, quantitycolumn);
+
+    vbox = new VBox();
+    vbox.getChildren().addAll(table, hbox);
+
+
+  }
+
 
   public static void main(String[] args) {
     launch(args);

@@ -9,23 +9,23 @@ import java.util.Map.Entry;
 public class Graph<T extends Comparable<T>> implements IGraph<T> {
 
 
-	HashMap<Node<T>, HashSet<Node<T>>> vertici;
+	HashMap<New_Node<T>, HashSet<New_Node<T>>> vertici;
 
 	public Graph() {
-		this.vertici = new HashMap<Node<T>, HashSet<Node<T>>>();
+		this.vertici = new HashMap<New_Node<T>, HashSet<New_Node<T>>>();
 	}
 
 	@Override
-	public void insertNode(Node<T> u) {
+	public void insertNode(New_Node<T> u) {
 		if (!this.vertici.containsKey(u))
-			this.vertici.put(u, new HashSet<Node<T>>());
+			this.vertici.put(u, new HashSet<New_Node<T>>());
 	}
 
 	@Override
-	public void deleteNode(Node<T> u) {
+	public void deleteNode(New_Node<T> u) {
 
 		if (this.vertici.containsKey(u)) {
-			for (Node<T> v : this.vertici.keySet()) {
+			for (New_Node<T> v : this.vertici.keySet()) {
 				this.deleteEdge(v, u);
 			}
 			this.vertici.remove(u);
@@ -36,7 +36,7 @@ public class Graph<T extends Comparable<T>> implements IGraph<T> {
 	}
 
 	@Override
-	public void insertEdge(Node<T> u, Node<T> v) {
+	public void insertEdge(New_Node<T> u, New_Node<T> v) {
 		if (this.vertici.containsKey(u) && this.vertici.containsKey(v))
 			System.out.println("U: " + u +" V: " + v);
 			this.vertici.get(u).add(v);
@@ -44,14 +44,14 @@ public class Graph<T extends Comparable<T>> implements IGraph<T> {
 	}
 
 	@Override
-	public void deleteEdge(Node<T> u, Node<T> v) {
+	public void deleteEdge(New_Node<T> u, New_Node<T> v) {
 		if (this.vertici.containsKey(u))
 			this.vertici.get(u).remove(v);
 
 	}
 
 	@Override
-	public Set<Node<T>> adj(Node<T> u) {
+	public Set<New_Node<T>> adj(New_Node<T> u) {
 		// ritorna null se U non esiste
 		if (this.vertici.containsKey(u))
 			return this.vertici.get(u);
@@ -60,14 +60,14 @@ public class Graph<T extends Comparable<T>> implements IGraph<T> {
 	}
 
 	@Override
-	public Set<Node<T>> V() {
+	public Set<New_Node<T>> V() {
 		return this.vertici.keySet();
 	}
 
 	@Override
 	public void print() {
 
-		for (Entry<Node<T>, HashSet<Node<T>>> e : this.vertici.entrySet()) {
+		for (Entry<New_Node<T>, HashSet<New_Node<T>>> e : this.vertici.entrySet()) {
 			System.out.println(e.getKey() + " : " + e.getValue());
 		}
 
@@ -76,7 +76,7 @@ public class Graph<T extends Comparable<T>> implements IGraph<T> {
 
 	public boolean Find(Double X, Double Y){
 
-		for (Entry<Node<T>, HashSet<Node<T>>> e : this.vertici.entrySet()){
+		for (Entry<New_Node<T>, HashSet<New_Node<T>>> e : this.vertici.entrySet()){
 			if(this.vertici.containsValue(X)){
 				System.out.println("found");
 

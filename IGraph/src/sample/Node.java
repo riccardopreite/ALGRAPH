@@ -62,15 +62,14 @@ public class Node<T> {
 		return null;
 	}
 	public int DeleteElement(New_Node toDelete, BorderPane layout,Integer count,New_Node tmphead){
-		New_Node tmp = new New_Node();
-		New_Node tmp2 = new New_Node();
+		New_Node tmp;
+		New_Node tmp2;
 		tmp = toDelete;
 		tmp2 = tmphead;
-		Integer index = 0;
-				if (tmp.equals(tmp2.getHead())) {
+				if (tmp.equals(tmphead)) {
 					if(tmp.getNext() != null){
 						tmp.remove_element(layout);
-						tmp.setHead(tmp.getNext());
+						tmphead = tmp.getNext();
 						tmp.setCircle(null);
 						tmp.setCircleX(null);
 						tmp.setCircleY(null);
@@ -83,7 +82,7 @@ public class Node<T> {
 						tmp.setCircleX(null);
 						tmp.setCircleY(null);
 						tmp.setElement(null);
-						tmp.setHead(null);
+						tmphead = null;
 
 						return 0;
 					}

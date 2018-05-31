@@ -83,7 +83,7 @@ public class New_Node<T> {
         line_list.add(index, line);
     }
 
-    public void getLine(Double X,Double Y, Double OldX, Double OldY){
+    public void Change_Line(Double X,Double Y, Double OldX, Double OldY){
         Integer index = 0;
         Line line;
         for ( Object pd : line_list) {
@@ -102,6 +102,28 @@ public class New_Node<T> {
         }
 
 
+    }
+
+    public void Remove_line(New_Node start, New_Node end, BorderPane layout){
+        Integer index = 0, ind = 0;
+        if(start != null && end != null) {
+
+            for (Object line : start.line_list) {
+                ind = 0;
+                for (Object line2 : end.line_list) {
+                    if (line == line2) {
+                        layout.getChildren().remove(line);
+                        end.line_list.set(ind, null);
+                        start.line_list.set(index, null);
+                        return;
+                    } else ind++;
+
+                }
+                index++;
+
+            }
+        }
+        return;
     }
 
     public void remove_element(BorderPane layout){

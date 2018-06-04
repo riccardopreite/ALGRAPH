@@ -2,8 +2,10 @@ package sample;
 
 import com.sun.org.apache.bcel.internal.generic.MONITORENTER;
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
@@ -39,16 +41,16 @@ import static javafx.scene.paint.Color.BLUE;
 
 
 public class Main extends Application {
-  Boolean edge = false, removed = false, add = false,move = false, delete_edge = false;
+  Boolean edge = false, removed = false, add = false,move = false, delete_edge = false,wait = true, opened = false;
   Double startLineX, startLineY, endLineX, endLineY, LinX, LinY;
   Scene scene1, scene2;
-  Stage window, window2;
+  Stage window;
   BorderPane layout, layout2;
   Circle circle;
   Line line;
   Integer  count = 0;
   Node node;
-  New_Node pd = null;
+  New_Node forFile = null;
   Node head = null;
   public New_Node tmphead = null,tmpnode = null;
   public New_Node edgeF,edgeS,edgeFN,edgeSN;
@@ -60,13 +62,14 @@ public class Main extends Application {
 
   File file;
 
+  public Thread ciao;
 
 
   Graph graph = new Graph();
   TextField nameinput;
   TextField priceinput;
   TextField quantityinput;
-  TableView table;
+  public TableView table;
   Stage secondStage,InputStage;
   VBox vbox;
  // private Desktop desktop = Desktop.getDesktop();
@@ -82,6 +85,7 @@ public class Main extends Application {
     window.setTitle("making Menux");
 
     //File menu
+
 
 
     Menu filemenu = new Menu("File");
@@ -105,6 +109,8 @@ public class Main extends Application {
       count = 0;
       line = null;
       edge = false;
+      opened = false;
+
       removed = false;
       add = false;
       move = false;
@@ -130,6 +136,8 @@ public class Main extends Application {
       count = 0;
       line = null;
       edge = false;
+      opened = false;
+
       removed = false;
       add = false;
       move = false;
@@ -157,12 +165,17 @@ public class Main extends Application {
       count = 0;
       line = null;
       edge = false;
+      opened = false;
       removed = false;
       add = false;
       move = false;
       head = null;
       graph = new Graph();
+      window.setScene(scene2);
+      window.show();
+      set_View();
       vertex = vertex();
+
 
       window.setX(600);
       window.setY(50);
@@ -194,6 +207,18 @@ public class Main extends Application {
     layout2.addEventHandler(MouseEvent.MOUSE_MOVED, select);
 
     filemenu.getItems().addAll(newfile, openfile, randomfile, exitfile);
+
+
+
+
+    //Option menu
+
+    Menu optionmenu = new Menu("Option");
+    MenuItem skip = new MenuItem("Skip sequence");
+    skip.setOnAction(e -> {
+      this.wait = false;
+    });
+    optionmenu.getItems().add(skip);
 
     //Edit menu
     Menu editmenu = new Menu("Edit");
@@ -429,20 +454,19 @@ public class Main extends Application {
     //Main menu bar
     MenuBar menuBar = new MenuBar();
     MenuBar menuBar2 = new MenuBar();
-    menuBar.getMenus().addAll(filemenu, editmenu, helpmenu);
-    menuBar2.getMenus().addAll(filemenu, editmenu, helpmenu);
+    menuBar.getMenus().addAll(filemenu, editmenu,optionmenu, helpmenu);
+    menuBar2.getMenus().addAll(filemenu, editmenu,optionmenu, helpmenu);
 
 
     //EDGE
 
 
     layout2.setTop(menuBar2);
-    layout2.getChildren().addAll();
 
     scene2 = new Scene(layout2, 1200, 900);
     layout = new BorderPane();
     layout.setTop(menuBar);
-    scene1 = new Scene(layout, 200, 250);
+    scene1 = new Scene(layout, 300, 350);
 
     window.setScene(scene1);
     window.show();
@@ -450,33 +474,82 @@ public class Main extends Application {
     window.setY(50);
   }
 
-  private void openFile(File file) {
+  private void openFile(File file)  {
     URL path = null;
 
     try {
 //      desktop.open(file);
 
       path = file.toURL();
-      InputStream is = path.openStream();
-      BufferedReader br=new BufferedReader(new InputStreamReader(is));
-      int i;
-      String line_file;
+      FileReader is = new FileReader(file);
+      BufferedReader br=new BufferedReader(is,100);
+      int element_int = 0;
+      int index = 0;
+      double element_double = 0.0;
+      String element_string = "";
+      String line_file = "";
+
     //  do
    //  {
-        line_file = "";
       do{
+        line_file = "";
         line_file = br.readLine();
-        if(line_file == "Vertex:"){
-
-          //Aggiungi vertex
-          System.out.println("Vertici aggiunti");
-        }
         System.out.println(line_file);
 
-        i = br.read();
+        if(line_file != null) {
+          if (line_file.equals("Vertex:")) {
+
+            //Aggiungi vertex
+            //prendi numero da riga successiva
+            //chiama random graph fino ai nodi
+            line_file = br.readLine();
+            vertex = Integer.parseInt(line_file);
+            opened = true;
+            Create_rand_Graph(vertex,table);
+            System.out.println("Vertici aggiunti");
+          } else if (line_file.equals("Element:")) {
+
+
+            while (!line_file.equals("Edges:") && index < vertex) {
+              //Prende i numeri dei nodi e crea u)
+              line_file = br.readLine();
+              if (line_file == "1") {
+                line_file = br.readLine();
+                forFile = tmphead.returnNode(index,tmphead);
+                element_int = Integer.parseInt(line_file);
+                forFile.setElement(element_int);
+
+                //int
+              } else if (line_file == "2") {
+                line_file = br.readLine();
+                forFile = tmphead.returnNode(index,tmphead);
+                element_double = Double.parseDouble(line_file);
+                forFile.setElement(element_double);
+
+                //double
+              } else if (line_file == "3") {
+                forFile = tmphead.returnNode(index,tmphead);
+                line_file = br.readLine();
+                forFile.setElement(line_file);
+
+                //string
+              }
+              //while col numero di nodi preso prima, ignora le restanti righe fino agli archi
+              //Inserisce l'elemento per il nodo corrispettivo, nell'ordine scritto.
+              //Controllo se int, double o string
+              //inserisce l'elemento nel nodo
+              System.out.println("Element added");
+              index++;
+            }
+          }else if (line_file.equals("Edges:")) {
+            //Prende i numeri dei nodi e crea un arco fra loro, se un arco già esiste non lo ricrea
+            System.out.println("Edges added");
+          }
+        }
+       // i = br.read();
 
       }
-      while(i != -1);
+      while(line_file != null);
 
    //   }
    //   while (i!=-1);
@@ -869,6 +942,8 @@ return false;
               // drag = head.FindElement(event.getX(), event.getY());
               LinX = drag.getCircleX();
               LinY = drag.getCircleY();
+              return;
+
               //  }
 
             } else if (event.getX() < 20) {
@@ -879,6 +954,8 @@ return false;
               //   drag = head.FindElement(event.getX(), event.getY());
               LinX = drag.getCircleX();
               LinY = drag.getCircleY();
+              return;
+
               //  }
 
             } else {
@@ -889,10 +966,11 @@ return false;
               // drag = head.FindElement(event.getX(), event.getY());
               LinX = drag.getCircleX();
               LinY = drag.getCircleY();
+              return;
+
               //  }
 
             }
-            return;
           } else if (event.getY() > 880) {
             if (event.getX() > 1180) {
               drag.Change_Line(1180.0, 880.0, LinX, LinY);
@@ -902,6 +980,8 @@ return false;
               //  drag = head.FindElement(event.getX(), event.getY());
               LinX = drag.getCircleX();
               LinY = drag.getCircleY();
+              return;
+
               //   }
 
             } else if (event.getX() < 20) {
@@ -912,6 +992,8 @@ return false;
               //  drag = head.FindElement(event.getX(), event.getY());
               LinX = drag.getCircleX();
               LinY = drag.getCircleY();
+              return;
+
               // }
 
             } else {
@@ -922,10 +1004,11 @@ return false;
               // drag = head.FindElement(event.getX(), event.getY());
               LinX = drag.getCircleX();
               LinY = drag.getCircleY();
+              return;
+
               //  }
 
             }
-            return;
           }
           if (event.getX() < 20) {
             if (event.getY() < 44) {
@@ -936,6 +1019,8 @@ return false;
               //  drag = head.FindElement(event.getX(), event.getY());
               LinX = drag.getCircleX();
               LinY = drag.getCircleY();
+              return;
+
               // }
             } else if (event.getY() > 880) {
               //   if(drag.ifLine()) {
@@ -945,6 +1030,8 @@ return false;
               //  drag = head.FindElement(event.getX(), event.getY());
               LinX = drag.getCircleX();
               LinY = drag.getCircleY();
+              return;
+
               //  }
             } else {
               //           if(drag.ifLine()) {
@@ -954,11 +1041,12 @@ return false;
               //  drag = head.FindElement(event.getX(), event.getY());
               LinX = drag.getCircleX();
               LinY = drag.getCircleY();
+              return;
+
               //       }
 
             }
 
-            return;
           } else if (event.getX() > 1180) {
             if (event.getY() < 44) {
               //      if(drag.ifLine()) {
@@ -968,6 +1056,8 @@ return false;
               // drag = head.FindElement(event.getX(), event.getY());
               LinX = drag.getCircleX();
               LinY = drag.getCircleY();
+              return;
+
               //   }
 
             } else if (event.getY() > 880) {
@@ -978,6 +1068,8 @@ return false;
               //   drag = head.FindElement(event.getX(), event.getY());
               LinX = drag.getCircleX();
               LinY = drag.getCircleY();
+              return;
+
               //   }
 
             } else {
@@ -988,9 +1080,9 @@ return false;
               //   drag = head.FindElement(event.getX(), event.getY());
               LinX = drag.getCircleX();
               LinY = drag.getCircleY();
+              return;
               //  }
             }
-            return;
 
           } else {
             //    if(drag.ifLine()) {
@@ -1000,6 +1092,8 @@ return false;
             // drag = head.FindElement(event.getX(), event.getY());
             LinX = drag.getCircleX();
             LinY = drag.getCircleY();
+            return;
+
             //    }
 
           }
@@ -1026,9 +1120,9 @@ return false;
         vertex = Integer.parseInt(InputVertex.getText());
         System.out.println(vertex);
         if(vertex <= 20){
-          set_View();
+//        window.show();
           Create_rand_Graph(vertex, table);
-          window.setScene(scene2);
+
 
         }
       }
@@ -1046,7 +1140,7 @@ return false;
     InputStage = new Stage();
     InputStage.setScene(scene3);
     InputStage.show();
-return vertex;
+    return vertex;
   }
   public Boolean Set_element(New_Node tmp){
     TextField InputVertex = new TextField();
@@ -1158,7 +1252,7 @@ return vertex;
     Integer index = 0;
 
     if(vertex != 0){
-      System.out.println("coap");
+
       while (index < vertex) {
         randX = (double) (Math.random() * 1180 + 20);
         randY = (double) (Math.random() * 831 + 49);
@@ -1188,12 +1282,30 @@ return vertex;
            // table.setItems(nodes);
           table.setItems(nodes);
 
+
+
+          if(wait){
+
+            ciao = new Thread(() -> {
+
+              try {
+                Thread.sleep(1500);
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
+
+            });
+            // ciao.join();
+            ciao.run();
+
+          }
+          layout2.getChildren().addAll(circle);
+      //    layout2.getChildren().addAll(circle);
+
           head.AddNode(tmphead, null, count, tmphead);
 
           tmp2 = tmphead;
 
-
-          layout2.getChildren().addAll(circle);
           this.count++;
           this.move = false;
           index++;
@@ -1204,10 +1316,46 @@ return vertex;
           tmpnode.setCircleY(randY);
           tmpnode.setCircle(circle);
           graph.insertNode(tmpnode);
+         /*
+          if(wait){
+            try {
+               ciao = new Thread(() -> {
+                 try {
+                   Thread.sleep(1500);
+                 } catch (InterruptedException e) {
+                   e.printStackTrace();
+                 }
+               });
+               ciao.join();
+              ciao.run();
+              layout2.getChildren().addAll(circle);
+
+            }
+            catch (Exception e) {}
+          }
+*/
+
+          if(wait){
+
+              ciao = new Thread(() -> {
+
+                  try {
+                    Thread.sleep(1500);
+                  } catch (InterruptedException e) {
+                    e.printStackTrace();
+                  }
+
+              });
+             // ciao.join();
+              ciao.run();
+
+          }
+          layout2.getChildren().addAll(circle);
+
           head.AddNode(tmp2, tmpnode,count,tmphead);
           tmp2 = tmpnode;
 
-          layout2.getChildren().addAll(circle);
+         //
           this.count++;
           this.move = false;
           index++;
@@ -1216,17 +1364,18 @@ return vertex;
         }
 
 
-      }
-
-
-      index = 0;
-      Double control = 100 - (vertex * 4.75);
-      while(index < vertex){
-        head.random_graph(layout2,index, control,graph,tmphead);
-        index++;
 
       }
 
+      if(!opened) {
+        index = 0;
+        Double control = 100 - (vertex * 4.75);
+        while (index < vertex) {
+          head.random_graph(layout2, index, control, graph, tmphead);
+          index++;
+
+        }
+      }
 
 
     }
@@ -1324,5 +1473,37 @@ return vertex;
   }
   public static void main(String[] args) {
     launch(args);
+  }
+
+public interface AsyncCallback {
+  /**
+   * Success callback
+   */
+  void onComplete();
+  /**
+   * Error callback
+   * @param e Exception thrown by the asynchronous call
+   */
+  void onError(Exception e);
+}
+
+  /**
+   * Runs a runnable, waits a delay and finally calls the callback
+   * @param beforeRunnable Code to run before the timeout
+   * @param delay Delay after executing the runnable and before calling the callback
+   * @param callback Callback called after the delay
+   */
+  public static void setTimeout(Runnable beforeRunnable, int delay, AsyncCallback callback){
+    beforeRunnable.run();
+
+    new Thread(() -> {
+      try {
+        Thread.sleep(delay);
+        Platform.runLater(callback::onComplete);
+      }
+      catch (Exception e){
+        callback.onError(e);
+      }
+    }).start();
   }
 }

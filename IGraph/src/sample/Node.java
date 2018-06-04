@@ -165,23 +165,24 @@ public void random_graph(BorderPane layout, Integer index, Double control,Graph 
 		}
 		while(tmp != null) {
 			probability = (Double) Math.random() * 99 + 1;
-
-			if (probability <= control) {
-				//add line
-				if(!tmp.equals(tmp2)){
-					line2 = new Line();
-					line2.setEndX(tmp.getCircleX());
-					line2.setEndY(tmp.getCircleY());
-             		line2.setStartX(tmp2.getCircleX());
-					line2.setStartY(tmp2.getCircleY());
-					tmp2.setLine(line2);
-					tmp.setLine(line2);
-				    layout.getChildren().add(line2);
-				    System.out.println();
-					graph.insertEdge(tmp2, tmp);
-				}
+			if (!tmp.equals(tmp2)) {
+				if (tmp.ifLine(tmp, tmp2)){
+					if (probability <= control) {
+						//add line
+						line2 = new Line();
+						line2.setEndX(tmp.getCircleX());
+						line2.setEndY(tmp.getCircleY());
+						line2.setStartX(tmp2.getCircleX());
+						line2.setStartY(tmp2.getCircleY());
+						tmp2.setLine(line2);
+						tmp.setLine(line2);
+						layout.getChildren().add(line2);
+						System.out.println();
+						graph.insertEdge(tmp2, tmp);
+					}
 
 			}
+		}
 			tmp = tmp.getNext();
 		}
 	}

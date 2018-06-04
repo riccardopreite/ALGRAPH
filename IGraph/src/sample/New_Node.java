@@ -88,19 +88,21 @@ public class New_Node<T> {
         Line line;
         for ( Object pd : line_list) {
             line = line_list.get(index);
-            if((OldX.equals(line.getStartX())) && (OldY.equals(line.getStartY()))) {
-                System.out.println("START");
-                line.setStartX(X);
-                line.setStartY(Y);
-            }
-            if( (OldX.equals(line.getEndX())) && (OldY.equals(line.getEndY()))) {
-                System.out.println("END");
-                line.setEndX(X);
-                line.setEndY(Y);
+            if (line != null) {
+                if ((OldX.equals(line.getStartX())) && (OldY.equals(line.getStartY()))) {
+                    System.out.println("START");
+                    line.setStartX(X);
+                    line.setStartY(Y);
+                }
+                if ((OldX.equals(line.getEndX())) && (OldY.equals(line.getEndY()))) {
+                    System.out.println("END");
+                    line.setEndX(X);
+                    line.setEndY(Y);
+                }
+
             }
             index++;
         }
-
 
     }
 
@@ -167,5 +169,29 @@ public class New_Node<T> {
     public String toString() {
 
         return this.circleX.toString();
+    }
+
+    public boolean ifLine(New_Node tmp, New_Node tmp2){
+        for (Object line : tmp.line_list) {
+            for (Object line2 : tmp2.line_list) {
+                if (line == line2) {
+                    return false;
+                }
+
+            }
+        }
+        return true;
+
+    }
+    public New_Node returnNode(Integer index,New_Node tmphead){
+        int aux = 0;
+        New_Node tmp = tmphead;
+        while(aux != index){
+            if(tmp.getNext() != null) {
+                tmp = tmp.getNext();
+            }
+            aux++;
+        }
+        return tmp;
     }
 }

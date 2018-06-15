@@ -1,84 +1,58 @@
 package sample;
-
-import com.sun.org.apache.bcel.internal.generic.MONITORENTER;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
+import sample.Edit.EditNode;
+import sample.File.ConfirmBox;
+import sample.File.ManageFile;
+import sample.Kruskal;
+import sample.MouseEvent.Event;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.LineBuilder;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import jdk.internal.cmm.SystemResourcePressureImpl;
+import sample.Node.DFS;
+import sample.Node.Edges;
+import sample.Node.New_Node;
 
-import java.awt.*;
+import javax.swing.*;
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
-import static javafx.scene.paint.Color.BLACK;
-import static javafx.scene.paint.Color.BLUE;
-
+import static com.sun.deploy.uitoolkit.ToolkitStore.dispose;
 
 public class Main extends Application {
-  Boolean edge = false, removed = false, add = false,move = false, delete_edge = false,wait = true, opened = false;
-  Double startLineX, startLineY, endLineX, endLineY, LinX, LinY;
+  public Integer count = 0;
+
   Scene scene1, scene2;
   Stage window;
-  BorderPane layout, layout2;
-  Circle circle;
-  Line line;
-  Integer  count = 0;
-  Node node;
-  New_Node forFile = null;
-  Node head = null;
-  public New_Node tmphead = null,tmpnode = null;
-  public New_Node edgeF,edgeS,edgeFN,edgeSN;
-  public New_Node drag;
-  public Boolean clicked, complete,clicked2, complete2;
-  public Integer vertex = 0;
-  public Boolean answer = false;
-  public New_Node tmp2;
+  public Boolean open = false;
 
-  File file;
-
-  public Thread ciao;
+  JFrame window2;
+  public BorderPane layout, layout2;
+   ManageFile file = new ManageFile();
+  Kruskal krus = new Kruskal();
+  Event event = new Event();
+  EditNode edit = new EditNode();
+  File help ;
+  String HelpMenumessage ="",auxline;
+  public MenuItem newfile,openfile,savefile,randomfile,exitfile;
+  public Menu filemenu,editmenu,Kruskal,helpmenu;
+  public MenuBar menuBar;
 
 
-  Graph graph = new Graph();
-  TextField nameinput;
-  TextField priceinput;
-  TextField quantityinput;
-  public TableView table;
-  Stage secondStage,InputStage;
-  VBox vbox;
- // private Desktop desktop = Desktop.getDesktop();
-
-
-  @Override
   public void start(Stage primaryStage) throws Exception {
-    layout2 = new BorderPane();
+    System.out.println("sono vivo");
 
+    layout = new BorderPane();
+    layout2 = new BorderPane();
 
 
     window = primaryStage;
@@ -87,1423 +61,314 @@ public class Main extends Application {
     //File menu
 
 
-
-    Menu filemenu = new Menu("File");
+     filemenu = new Menu("File");
     window.setOnCloseRequest(e -> {
 
       e.consume();
-      closeProgram();
+      file.closeProgram();
     });
 
 
-    MenuItem newfile = new MenuItem("New");
+     newfile = new MenuItem("New");
     newfile.setOnAction(e -> {
-      if(count > 0){
-        layout2 = head.clearLayout(layout2,tmphead);
+      CloseStage();
+      file.NewFile();
+      event.SetManageFile(file);
+      event.file.tmphead = file.tmphead;
+      edit.SetManageFile(file);
+      event.SetEdit(edit);
+      event.adding = false;
+      event.setting = false;
+      event.FoundEdge = false;
+      if (count == 0) {
+        filemenu.getItems().removeAll(newfile, openfile, randomfile, exitfile);
+        filemenu.getItems().addAll(newfile, openfile, savefile, randomfile, exitfile);
+        menuBar.getMenus().removeAll(filemenu,helpmenu);
+        menuBar.getMenus().addAll(filemenu, editmenu, Kruskal, helpmenu);
+        layout2.setTop(menuBar);
+        count++;
+        event.DragCircle();
+        event.ViewMenu();
+        event.DeleteNode();
 
       }
-      if(secondStage != null) {
-        secondStage.close();
-      }
-      set_View();
-      count = 0;
-      line = null;
-      edge = false;
-      opened = false;
 
-      removed = false;
-      add = false;
-      move = false;
-      head = null;
-      graph = new Graph();
 
-      window.setX(600);
-      window.setY(50);
-      window.setScene(scene2);
+
 
     });
 
-    MenuItem openfile = new MenuItem("Open");
+
+     openfile = new MenuItem("Open");
     openfile.setOnAction(e -> {
-      if(count > 0){
-        layout2 = head.clearLayout(layout2,tmphead);
+      CloseStage();
+      file.Openfile();
+      event.SetManageFile(file);
+      event.file.tmphead = file.tmphead;
+      edit.SetManageFile(file);
+      event.SetEdit(edit);
+      event.adding = false;
+      event.setting = false;
+      event.FoundEdge = false;
+      if (count == 0) {
+        count++;
+        filemenu.getItems().removeAll(newfile, openfile, randomfile, exitfile);
+        filemenu.getItems().addAll(newfile, openfile, savefile, randomfile, exitfile);
+        menuBar.getMenus().removeAll(filemenu,helpmenu);
+        menuBar.getMenus().addAll(filemenu, editmenu, Kruskal, helpmenu);
+        layout2.setTop(menuBar);
+        event.DragCircle();
+        event.ViewMenu();
+        event.DeleteNode();
 
       }
-      if(secondStage != null) {
-        secondStage.close();
-      }
-      set_View();
-      count = 0;
-      line = null;
-      edge = false;
-      opened = false;
 
-      removed = false;
-      add = false;
-      move = false;
-      head = null;
-      graph = new Graph();
 
-      Openfile();
-      window.setX(600);
-      window.setY(50);
-      window.setScene(scene2);
+
 
     });
 
+     savefile = new MenuItem("Save As");
+    savefile.setOnAction(e -> {
+      CloseStage();
 
-    MenuItem randomfile = new MenuItem("Generate random");
+      file.SaveFile(file.vertex);
+    });
+
+
+     randomfile = new MenuItem("Generate random");
     randomfile.setOnAction(e -> {
-      if(count > 0){
-        layout2 = head.clearLayout(layout2,tmphead);
+      CloseStage();
+      file.Random();
+      event.SetManageFile(file);
+      event.file.tmphead = file.tmphead;
+      edit.SetManageFile(file);
+      event.SetEdit(edit);
+      event.adding = false;
+      event.setting = false;
+      event.FoundEdge = false;
+      if (count == 0) {
+        count++;
+        filemenu.getItems().removeAll(newfile, openfile, randomfile, exitfile);
+        filemenu.getItems().addAll(newfile, openfile, savefile, randomfile, exitfile);
+        menuBar.getMenus().removeAll(filemenu, helpmenu);
+        menuBar.getMenus().addAll(filemenu, editmenu, Kruskal, helpmenu);
+        layout2.setTop(menuBar);
+        event.DragCircle();
+        event.ViewMenu();
+        event.DeleteNode();
 
       }
-      if(secondStage != null) {
-        secondStage.close();
-      }
-
-      count = 0;
-      line = null;
-      edge = false;
-      opened = false;
-      removed = false;
-      add = false;
-      move = false;
-      head = null;
-      graph = new Graph();
-      window.setScene(scene2);
-      window.show();
-      set_View();
-      vertex = vertex();
-
-
-      window.setX(600);
-      window.setY(50);
     });
 
-
-    MenuItem exitfile = new MenuItem("Exit");
+     exitfile = new MenuItem("Exit");
     exitfile.setOnAction(e -> {
 
       e.consume();
-      closeProgram();
-    });
-
-    EventHandler<MouseEvent> select = mouseEvent -> {
-      New_Node selected;
-      if(head != null) {
-        if ((selected = head.FindElement(mouseEvent.getX(), mouseEvent.getY(), tmphead)) != null) {
-
-          circle = selected.getCircle();
-          circle.setFill(BLUE);
-
-        }
-        else{
-          head.rePrint_Circle(tmphead);
-        }
+      file.closeProgram();
+      try {
+        window2.setDefaultCloseOperation(
+                JFrame.EXIT_ON_CLOSE);
+        window2.dispatchEvent(new WindowEvent(window2, WindowEvent.WINDOW_CLOSING));
+      } catch (Exception t) {
       }
 
-    };
-    layout2.addEventHandler(MouseEvent.MOUSE_MOVED, select);
 
-    filemenu.getItems().addAll(newfile, openfile, randomfile, exitfile);
-
-
-
-
-    //Option menu
-
-    Menu optionmenu = new Menu("Option");
-    MenuItem skip = new MenuItem("Skip sequence");
-    skip.setOnAction(e -> {
-      this.wait = false;
     });
-    optionmenu.getItems().add(skip);
+
 
     //Edit menu
-    Menu editmenu = new Menu("Edit");
-    MenuItem Deletenode = new MenuItem("Delete Node");
-    Deletenode.setOnAction(e -> {
-      removed = true;
-      add = false;
-      edge = false;
-      move = false;
-      delete_edge = false;
-      clicked = true;
-      complete = false;
-      clicked2 = true;
-      complete2 = false;
+     editmenu = new Menu("Edit");
 
-      EventHandler<MouseEvent> delete = mouseEvent -> removed = Removenode(mouseEvent, removed);
-      layout2.addEventHandler(MouseEvent.MOUSE_PRESSED, delete);
+    Menu Node = new Menu("Node");
+    Menu Edge = new Menu("Edge");
 
-    });
 
+    //Add Node
     MenuItem Addnode = new MenuItem("Add Node");
     Addnode.setOnAction(e -> {
-      add = true;
-      edge = false;
-      removed = false;
-      move = false;
-      delete_edge = false;
-      clicked = true;
-      complete = false;
-      clicked2 = true;
-      complete2 = false;
-      EventHandler<MouseEvent> AddNode = mouseEvent -> this.add = addCircle(mouseEvent, add);
-      layout2.addEventHandler(MouseEvent.MOUSE_PRESSED, AddNode);
+      CloseStage();
+      event.file.tmphead = file.tmphead;
+      event.adding = true;
+      event.setting = false;
+      event.FoundEdge = false;
+      event.AddNode();
 
 
     });
 
+
+    //Set Element
+    MenuItem setElement = new MenuItem("Add/Change Element");
+
+    setElement.setOnAction(e -> {
+      CloseStage();
+
+      event.file.tmphead = file.tmphead;
+      event.setting = true;
+      event.FoundEdge = false;
+      event.adding = false;
+      event.SetElement();
+    });
+
+
+    //Add Edge
     MenuItem Add_Edge = new MenuItem("Add Edge");
     Add_Edge.setOnAction(e -> {
-      this.edge = true;
-      clicked2 = false;
-      complete2 = false;
-      EventHandler<MouseEvent> open = mouseEvent -> {
-        if (count < 2) {
-          System.out.println("poecodio minore di due finish");
-          return ;
-        }
-        else if ((mouseEvent.getButton() == MouseButton.PRIMARY) && clicked2 == false) {
-/*
-                  if(!clicked){
-                   this.edgeS = head.FindElement(mouseEvent.getX(), mouseEvent.getY(), tmphead);
-                   if(edgeS != null){
-                     System.out.println("edgeS " + this.edgeS);
+      CloseStage();
 
-
-                  }
-                  }
-                  else{
-                   this.edgeF = head.FindElement(mouseEvent.getX(), mouseEvent.getY(), tmphead);
-                    System.out.println("edgeF " + this.edgeF);
-
-                    if(edgeF == edgeS){
-                     this.edgeF = head.FindElement(mouseEvent.getX(), mouseEvent.getY(), tmphead);
-
-                   }
-                   if(edgeF != null){
-                     System.out.println("edgeF " + this.edgeF);
-
-                     complete = true;
-                  }
-                  }
-                  if(complete){
-                  delete_edge = Delete_edge(delete_edge);
-                  complete = false;
-                  clicked = false;
-
-
-                  }
-
-*/
-
-          this.edgeSN = head.FindElement(mouseEvent.getX(), mouseEvent.getY(), tmphead);
-          if(edgeSN != null) {
-            clicked2 = true;
-          }
-
-
-        }
-
-        if (clicked2) {
-          if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-            this.edgeFN = head.FindElement(mouseEvent.getX(), mouseEvent.getY(), tmphead);
-            if (edgeFN == edgeSN) {
-              this.edgeFN = head.FindElement(mouseEvent.getX(), mouseEvent.getY(), tmphead);
-
-            } else if (edgeFN != null) {
-              //  this.edgeF = head.FindElement(mouseEvent.getX(), mouseEvent.getY(), tmphead);
-              System.out.println("edgeF " + this.edgeFN);
-              System.out.println("ciao");
-              complete2 = true;
-
-
-            }
-
-          }
-        }
-        if (complete2) {
-          clicked2 = false;
-          edge = AddEdge(edge);
-          complete2 = false;
-
-        }
-        //
-
-
-      };
-      layout2.addEventHandler(MouseEvent.MOUSE_PRESSED, open);
-    });
-    /*
-    MenuItem EndEdge = new MenuItem("Choose End Node");
-    EndEdge.setOnAction(e -> {
-      this.edge2 = true;
-      EventHandler<MouseEvent> end = mouseEvent2 -> AddEnd(mouseEvent2, pd, this.edge2);
-      layout2.addEventHandler(MouseEvent.MOUSE_PRESSED, end);
+      event.file.tmphead = file.tmphead;
+      event.FoundEdge = true;
+      event.adding = false;
+      event.setting = false;
+      event.SetControl(0);
+      event.GetEdge(0);
 
     });
-*/
-    MenuItem MoveNode = new MenuItem("Move The Node");
-    MoveNode.setOnAction(e -> {
-      move = true;
-      move = MoveCircle(move);
 
-    });
 
     MenuItem DeleteEdge = new MenuItem("Delete Edge");
     DeleteEdge.setOnAction(e -> {
-              delete_edge = true;
-              clicked = false;
-              complete = false;
-              EventHandler<MouseEvent> setfirst = mouseEvent -> {
-                if (count < 2) {
-                  System.out.println("poecodio minore di due finish");
-                  return ;
-                }
-                else if ((mouseEvent.getButton() == MouseButton.PRIMARY) && clicked == false) {
-/*
-                  if(!clicked){
-                   this.edgeS = head.FindElement(mouseEvent.getX(), mouseEvent.getY(), tmphead);
-                   if(edgeS != null){
-                     System.out.println("edgeS " + this.edgeS);
+      CloseStage();
+
+      event.file.tmphead = file.tmphead;
+      event.FoundEdge = true;
+      event.adding = false;
+      event.setting = false;
+      event.SetControl(1);
+      event.GetEdge(1);
+    });
+    MenuItem ChangeWeight = new MenuItem("Change Weight");
+    ChangeWeight.setOnAction(e -> {
+      CloseStage();
+
+      event.file.tmphead = file.tmphead;
+      event.FoundEdge = true;
+      event.adding = false;
+      event.setting = false;
+      event.SetControl(2);
+      event.GetEdge(2);
 
 
-                  }
-                  }
-                  else{
-                   this.edgeF = head.FindElement(mouseEvent.getX(), mouseEvent.getY(), tmphead);
-                    System.out.println("edgeF " + this.edgeF);
+    });
+    editmenu.getItems().addAll(Node, Edge);
+    Node.getItems().addAll(Addnode, setElement);
+    Edge.getItems().addAll(Add_Edge, DeleteEdge, ChangeWeight);
 
-                    if(edgeF == edgeS){
-                     this.edgeF = head.FindElement(mouseEvent.getX(), mouseEvent.getY(), tmphead);
+     Kruskal = new Menu("Option");
+    MenuItem doKruskal = new MenuItem("Kruskal");
+    doKruskal.setOnAction(e -> {
 
-                   }
-                   if(edgeF != null){
-                     System.out.println("edgeF " + this.edgeF);
+      CloseStage();
+      event.adding = false;
+      event.setting = false;
+      event.FoundEdge = false;
+      krus.SetManageFile(file);
+      krus.UsingKruskal(file.layout, scene2);
 
-                     complete = true;
-                  }
-                  }
-                  if(complete){
-                  delete_edge = Delete_edge(delete_edge);
-                  complete = false;
-                  clicked = false;
+    });
 
-
-                  }
-
-*/
-
-
-                  this.edgeS = head.FindElement(mouseEvent.getX(), mouseEvent.getY(), tmphead);
-                  if(edgeS != null) {
-                    clicked = true;
-                  }
-
-
-                }
-
-                if (clicked) {
-                  if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                    this.edgeF = head.FindElement(mouseEvent.getX(), mouseEvent.getY(), tmphead);
-                    if(edgeF == edgeS){
-                      this.edgeF = head.FindElement(mouseEvent.getX(), mouseEvent.getY(), tmphead);
-
-                    }
-                    else if (edgeF != null) {
-                    //  this.edgeF = head.FindElement(mouseEvent.getX(), mouseEvent.getY(), tmphead);
-                      System.out.println("edgeF " + this.edgeF);
-                      System.out.println("ciao");
-                      complete = true;
-
-
-
-                    }
-                    if (complete){
-                      clicked = false;
-                      delete_edge = Delete_edge(delete_edge);
-                      complete = false;
-
-                    }
-                  }
-
-                }
-                //
-
-
-              };
-              layout2.addEventHandler(MouseEvent.MOUSE_PRESSED, setfirst);
-            });
-
-
-    editmenu.getItems().addAll(Addnode, Add_Edge, Deletenode,MoveNode,DeleteEdge);
-
-
+    Kruskal.getItems().addAll(doKruskal);
     //Help menu
-    Menu helpmenu = new Menu("Help");
+     helpmenu = new Menu("Help");
     MenuItem Help = new MenuItem("Show Help Menu");
     Help.setOnAction(e -> {
+      if(!open) {
+        HelpMenu();
+        open = true;
+      }
+
+      window2.toFront();
+      window2.show();
 
     });
     helpmenu.getItems().addAll(Help);
 
 
     //Main menu bar
-    MenuBar menuBar = new MenuBar();
-    MenuBar menuBar2 = new MenuBar();
-    menuBar.getMenus().addAll(filemenu, editmenu,optionmenu, helpmenu);
-    menuBar2.getMenus().addAll(filemenu, editmenu,optionmenu, helpmenu);
+     menuBar = new MenuBar();
+    filemenu.getItems().addAll(newfile, openfile, randomfile, exitfile);
 
+    menuBar.getMenus().addAll(filemenu, helpmenu);
+    layout.setTop(menuBar);
 
-    //EDGE
-
-
-    layout2.setTop(menuBar2);
+    scene1 = new Scene(layout, 300, 350);
+    window.setScene(scene1);
 
     scene2 = new Scene(layout2, 1200, 900);
-    layout = new BorderPane();
-    layout.setTop(menuBar);
-    scene1 = new Scene(layout, 300, 350);
+    layout2.setStyle("-fx-background-color: rgba(100, 100, 100, 0.5);");
 
-    window.setScene(scene1);
+    file.SetLayout(layout2, window, scene2,menuBar,filemenu,editmenu,Kruskal,helpmenu);
+    event.SetLayout(layout2, window, scene2);
+    edit.SetLayout(layout2, window, scene2);
+
+
+    layout.setStyle("-fx-background-color: rgba(100, 100, 100, 0.5);");
+
     window.show();
-    window.setX(600);
-    window.setY(50);
+
+
   }
 
-  private void openFile(File file)  {
-    URL path = null;
-
+  public void HelpMenu(){
+    help = new File("Guide.txt");
     try {
-//      desktop.open(file);
-
-      path = file.toURL();
-      FileReader is = new FileReader(file);
+      FileReader is = new FileReader(help);
       BufferedReader br=new BufferedReader(is,100);
-      int element_int = 0;
-      int index = 0;
-      double element_double = 0.0;
-      String element_string = "";
-      String line_file = "";
+      auxline = br.readLine();
 
-    //  do
-   //  {
-      do{
-        line_file = "";
-        line_file = br.readLine();
-        System.out.println(line_file);
-
-        if(line_file != null) {
-          if (line_file.equals("Vertex:")) {
-
-            //Aggiungi vertex
-            //prendi numero da riga successiva
-            //chiama random graph fino ai nodi
-            line_file = br.readLine();
-            vertex = Integer.parseInt(line_file);
-            opened = true;
-            Create_rand_Graph(vertex,table);
-            System.out.println("Vertici aggiunti");
-          } else if (line_file.equals("Element:")) {
-
-
-            while (!line_file.equals("Edges:") && index < vertex) {
-              //Prende i numeri dei nodi e crea u)
-              line_file = br.readLine();
-              if (line_file == "1") {
-                line_file = br.readLine();
-                forFile = tmphead.returnNode(index,tmphead);
-                element_int = Integer.parseInt(line_file);
-                forFile.setElement(element_int);
-
-                //int
-              } else if (line_file == "2") {
-                line_file = br.readLine();
-                forFile = tmphead.returnNode(index,tmphead);
-                element_double = Double.parseDouble(line_file);
-                forFile.setElement(element_double);
-
-                //double
-              } else if (line_file == "3") {
-                forFile = tmphead.returnNode(index,tmphead);
-                line_file = br.readLine();
-                forFile.setElement(line_file);
-
-                //string
-              }
-              //while col numero di nodi preso prima, ignora le restanti righe fino agli archi
-              //Inserisce l'elemento per il nodo corrispettivo, nell'ordine scritto.
-              //Controllo se int, double o string
-              //inserisce l'elemento nel nodo
-              System.out.println("Element added");
-              index++;
-            }
-          }else if (line_file.equals("Edges:")) {
-            //Prende i numeri dei nodi e crea un arco fra loro, se un arco già esiste non lo ricrea
-            System.out.println("Edges added");
-          }
-        }
-       // i = br.read();
-
-      }
-      while(line_file != null);
-
-   //   }
-   //   while (i!=-1);
-      /*
       do
       {
-        i=br.read();
-        System.out.print((char)i);
+        HelpMenumessage = HelpMenumessage + auxline + '\n';
+        auxline = br.readLine();
       }
-      while (i!=-1);
-      System.out.println("\n");
+      while (auxline!=null);
       is.close();
-*/
     }
-
-
     catch (MalformedURLException e)
     {
       System.out.println("Attenzione:" + e);
     } catch (IOException e) {
       System.out.println(e.getMessage());
     }
-
-  }
-
-  public void Openfile() {
-    Stage stage = new Stage();
-    FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Open Txt File");
-    fileChooser.setInitialDirectory(
-            new File(System.getProperty("user.home"))
-    );
-
-    fileChooser.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Txt", "*.txt")
-    );
-    file = fileChooser.showOpenDialog(stage);
-    if (file != null) {
-      openFile(file);
-    }
-
-  }
-
-  private void closeProgram() {
-     answer = ConfirmBox.display("Fuck God!!!", "Are you sure you want to exit?");
-
-    if (answer) {
-      if(secondStage != null) {
-        secondStage.close();
-      }
-
-      window.close();
-      System.out.println("File saved!");
-    }
-  }
-  public Boolean addCircle(MouseEvent mouseEvent, Boolean add){
-    if(!add){
-      // this.edge1 = false;
-      // this.edge2 = false;
-      // this.removed = false;
-      return false;
-    }
-    else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-      edge = false;
-      removed = false;
-      move = false;
-      delete_edge = false;
-      clicked = true;
-      complete = true;
-
-      if(mouseEvent.getY() < 45) {
-        System.out.println("Non va bene porcodio");
-        return false;
-
-      }
-      else if(mouseEvent.getY() > 880) {
-        System.out.println("Non va bene porcodio");
-        return false;
-
-      }
-      if (mouseEvent.getX() < 20) {
-        System.out.println("Non va bene porcodio2");
-        return false;
-
-
-      }
-
-      else if (mouseEvent.getX() > 1180) {
-        System.out.println("Non va bene porcodio2");
-        return false;
-
-
-      }else {
-        circle = new Circle(mouseEvent.getX(), mouseEvent.getY(), 20);
-      }
-       tmp2 = new New_Node();
-      TextField InputVertex = new TextField();
-      ToggleGroup group = new ToggleGroup();
-
-      RadioButton box1 = new RadioButton("Integer");
-      RadioButton box2 = new RadioButton("Double");
-      RadioButton box3 = new RadioButton("String");
-      box1.setToggleGroup(group);
-      box2.setToggleGroup(group);
-      box3.setToggleGroup(group);
-
-      box1.setSelected(true);
-
-      Button button = new Button("Choose");
-
-
-      VBox newInput = new VBox(10);
-
-      newInput.setPadding(new Insets(10,10,10,10));
-      newInput.getChildren().addAll(InputVertex, button, box1, box2, box3);
-
-      Scene scene3 = new Scene(newInput, 300, 250);
-      InputStage = new Stage();
-      InputStage.setScene(scene3);
-      InputStage.show();
-      if (this.count == 0) {
-
-        tmphead = new New_Node();
-
-        button.setOnAction(e -> {
-          if (box1.isSelected()) {
-            try {
-              int vertex = Integer.parseInt(InputVertex.getText());
-              tmphead.setElement(vertex);
-
-              InputStage.close();
-
-
-
-
-            } catch (NumberFormatException t) {
-              System.out.println("Error: " + InputVertex.getText() + " is a String");
-
-            }
-          } else if (box2.isSelected()) {
-            try {
-              Double vertex = Double.parseDouble(InputVertex.getText());
-              tmphead.setElement(vertex);
-
-              InputStage.close();
-
-            } catch (NumberFormatException t) {
-              System.out.println("Error: " + InputVertex.getText() + " is a String");
-
-            }
-          } else if (box3.isSelected()) {
-            tmphead.setElement(InputVertex.getText());
-            InputStage.close();
-
-
-          }
-          head = null;
-          head = new Node();
-          System.out.println("DENTRO");
-          tmphead.setCircleX(mouseEvent.getX());
-          tmphead.setCircleY(mouseEvent.getY());
-          tmphead.setCircle(circle);
-          graph.insertNode(tmphead);
-
-          head.AddNode(tmphead, null, count, tmphead);
-
-          tmp2 = tmphead;
-
-
-          layout2.getChildren().addAll(circle);
-          this.count++;
-          this.move = false;
-        });
-        }
-       else {
-        node = new Node();
-        tmpnode = new New_Node();
-
-      button.setOnAction(e -> {
-        if (box1.isSelected()) {
-          try {
-            int vertex = Integer.parseInt(InputVertex.getText());
-            tmpnode.setElement(vertex);
-
-            InputStage.close();
-
-
-          } catch (NumberFormatException t) {
-            System.out.println("Error: " + InputVertex.getText() + " is a String");
-
-          }
-        } else if (box2.isSelected()) {
-          try {
-            Double vertex = Double.parseDouble(InputVertex.getText());
-            tmpnode.setElement(vertex);
-
-            InputStage.close();
-
-          } catch (NumberFormatException t) {
-            System.out.println("Error: " + InputVertex.getText() + " is a String");
-
-          }
-        } else if (box3.isSelected()) {
-          tmpnode.setElement(InputVertex.getText());
-          InputStage.close();
-
-
-        }
-        tmpnode.setCircleX(mouseEvent.getX());
-        tmpnode.setCircleY(mouseEvent.getY());
-        tmpnode.setCircle(circle);
-
-        graph.insertNode(tmpnode);
-
-        head.AddNode(tmp2, tmpnode, count, tmphead);
-        tmp2 = tmpnode;
-
-        layout2.getChildren().addAll(circle);
-        this.count++;
-        this.move = false;
-      });
-        }
-
-
-      }
-
-    return false;
-  }
-
-
-  public Boolean Removenode(MouseEvent mouseEvent, Boolean removed){
-    New_Node delete,next = null;
-
-    int equal = 0;
-    if(removed) {
-      edge = false;
-      add = false;
-      move = false;
-      delete_edge = false;
-      clicked = true;
-      complete = true;
-
-      if(count == 0) {
-        return false;
-      }
-
-      if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-        delete = head.FindElement(mouseEvent.getX(), mouseEvent.getY(),tmphead);
-
-
-        if (delete != null) {
-          circle = head.CircleToDelete(delete);
-          if(delete == tmphead){
-            next = tmphead.getNext();
-             equal = 1;
-
-
-          }
-          this.count = head.DeleteElement(delete, this.layout2,count,this.tmphead);
-          if (this.count == 0){
-            head = null;
-          }
-          else if(equal == 1){
-            tmphead = next;
-          }
-          /*
-          if (delete == tmphead){
-            head = null;
-          */
-          graph.deleteNode(delete);
-          System.out.println("Element Deleted.");
-          graph.print();
-        }
-        if(head != null) {
-          head.print(tmphead);
-        }
-        this.move = false;
-
-      }
-      else return false;
-
-    }
-    return false;
-
-  }
-
-  public Boolean AddEdge(Boolean edge) {
-
-
-    if(edge) {
-      removed = false;
-      add = false;
-      move = false;
-      delete_edge = false;
-      clicked = true;
-      complete = true;
-      if(count < 2) {
-        System.out.println("poecodio minore di due finish");
-        this.move = false;
-        return false;
-      }
-
-        line = new Line();
-        line.setStartX(this.edgeSN.getCircleX());
-        line.setStartY(this.edgeSN.getCircleY());
-        line.setEndX(this.edgeFN.getCircleX());
-        line.setEndY(this.edgeFN.getCircleY());
-
-        //    System.out.println("Startx: " + this.startLineX + " Starty: " + this.startLineY + " Endx: " + endLineX + " Endy: " + endLineY  );
-        edgeSN.setLine(line);
-        edgeFN.setLine(line);
-        layout2.getChildren().addAll(line);
-
-        graph.insertEdge(edgeSN, edgeFN);
-        //   this.pd = null;
-
-        this.edge = false;
-        this.move = false;
-
-        graph.print();
-      }
-      else this.edge = false;
-
-return false;
-    }
-  
-  public Boolean Delete_edge(Boolean delete_edge) {
-
-    if (delete_edge) {
-      clicked = true;
-      complete = true;
-
-      System.out.println("Diversi");
-      System.out.println("EDGES: " + this.edgeS + " EDGEF " + this.edgeF);
-          tmphead.Remove_line(this.edgeS, this.edgeF, layout2);
-
-
-
-
-        return false;
-
-      }
-
-
-
-    return false;
+          window2 = new JFrame("Help");
+          final JTextArea textArea;
+          textArea = new JTextArea(10, 20);
+          JScrollPane scroll = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+          textArea.setText(HelpMenumessage);
+          textArea.setEditable(false);
+          textArea.setLineWrap(true);
+          textArea.setWrapStyleWord(true);
+          window2.add(scroll);
+          window2.setSize(630, 500);
+          window2.setVisible(true);
+          window2.setLocationRelativeTo(null);
 
 
   }
 
-  public Boolean MoveCircle(Boolean move){
 
-    if(move) {
-      edge = false;
-      removed = false;
-      add = false;
-      delete_edge = false;
-      clicked = true;
-      complete = true;
-      this.move = false;
-      layout2.setOnMousePressed(new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent event) {
-          New_Node delete = null;
-          if (event.getButton() == MouseButton.PRIMARY) {
-            if (head == null)
-            drag = null;
-            else {
-              drag = head.FindElement(event.getX(), event.getY(), tmphead);
-              if (drag != null) {
-                LinX = drag.getCircleX();
-                LinY = drag.getCircleY();
-              }
-            }
-          }
 
-
-        }
-      });
-
-      layout2.setOnMouseDragged(new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent event) {
-          if (drag == null) return;
-          if (event.getY() < 44) {
-            if (event.getX() > 1180) {
-              drag.Change_Line(1180.0, 49.0, LinX, LinY);
-              drag.ChangeCoordinates(1180.0, 49.0);
-              //  if(drag.ifLine()) {
-              // drag = head.FindElement(event.getX(), event.getY());
-              LinX = drag.getCircleX();
-              LinY = drag.getCircleY();
-              return;
-
-              //  }
-
-            } else if (event.getX() < 20) {
-              drag.Change_Line(21.0, 49.0, LinX, LinY);
-
-              drag.ChangeCoordinates(21.0, 49.0);
-              //   if(drag.ifLine()) {
-              //   drag = head.FindElement(event.getX(), event.getY());
-              LinX = drag.getCircleX();
-              LinY = drag.getCircleY();
-              return;
-
-              //  }
-
-            } else {
-              drag.Change_Line(event.getX(), 49.0, LinX, LinY);
-
-              drag.ChangeCoordinates(event.getX(), 49.0);
-              //   if(drag.ifLine() == true) {
-              // drag = head.FindElement(event.getX(), event.getY());
-              LinX = drag.getCircleX();
-              LinY = drag.getCircleY();
-              return;
-
-              //  }
-
-            }
-          } else if (event.getY() > 880) {
-            if (event.getX() > 1180) {
-              drag.Change_Line(1180.0, 880.0, LinX, LinY);
-
-              drag.ChangeCoordinates(1180.0, 880.0);
-              //  if(drag.ifLine()) {
-              //  drag = head.FindElement(event.getX(), event.getY());
-              LinX = drag.getCircleX();
-              LinY = drag.getCircleY();
-              return;
-
-              //   }
-
-            } else if (event.getX() < 20) {
-              // if(drag.ifLine()) {
-              drag.Change_Line(21.0, 880.0, LinX, LinY);
-              drag.ChangeCoordinates(21.0, 880.0);
-
-              //  drag = head.FindElement(event.getX(), event.getY());
-              LinX = drag.getCircleX();
-              LinY = drag.getCircleY();
-              return;
-
-              // }
-
-            } else {
-              //  if(drag.ifLine()) {
-              drag.Change_Line(event.getX(), 880.0, LinX, LinY);
-              drag.ChangeCoordinates(event.getX(), 880.0);
-
-              // drag = head.FindElement(event.getX(), event.getY());
-              LinX = drag.getCircleX();
-              LinY = drag.getCircleY();
-              return;
-
-              //  }
-
-            }
-          }
-          if (event.getX() < 20) {
-            if (event.getY() < 44) {
-              //  if(drag.ifLine()) {
-              drag.Change_Line(20.0, 49.0, LinX, LinY);
-              drag.ChangeCoordinates(20.0, 49.0);
-
-              //  drag = head.FindElement(event.getX(), event.getY());
-              LinX = drag.getCircleX();
-              LinY = drag.getCircleY();
-              return;
-
-              // }
-            } else if (event.getY() > 880) {
-              //   if(drag.ifLine()) {
-              drag.Change_Line(20.0, 880.0, LinX, LinY);
-              drag.ChangeCoordinates(20.0, 880.0);
-
-              //  drag = head.FindElement(event.getX(), event.getY());
-              LinX = drag.getCircleX();
-              LinY = drag.getCircleY();
-              return;
-
-              //  }
-            } else {
-              //           if(drag.ifLine()) {
-              drag.Change_Line(20.0, event.getY(), LinX, LinY);
-              drag.ChangeCoordinates(20.0, event.getY());
-
-              //  drag = head.FindElement(event.getX(), event.getY());
-              LinX = drag.getCircleX();
-              LinY = drag.getCircleY();
-              return;
-
-              //       }
-
-            }
-
-          } else if (event.getX() > 1180) {
-            if (event.getY() < 44) {
-              //      if(drag.ifLine()) {
-              drag.Change_Line(1180.0, 49.0, LinX, LinY);
-              drag.ChangeCoordinates(1180.0, 49.0);
-
-              // drag = head.FindElement(event.getX(), event.getY());
-              LinX = drag.getCircleX();
-              LinY = drag.getCircleY();
-              return;
-
-              //   }
-
-            } else if (event.getY() > 880) {
-              //    if(drag.ifLine()) {
-              drag.Change_Line(1180.0, 880.0, LinX, LinY);
-              drag.ChangeCoordinates(1180.0, 880.0);
-
-              //   drag = head.FindElement(event.getX(), event.getY());
-              LinX = drag.getCircleX();
-              LinY = drag.getCircleY();
-              return;
-
-              //   }
-
-            } else {
-              //   if(drag.ifLine()) {
-              drag.Change_Line(1180.0, event.getY(), LinX, LinY);
-              drag.ChangeCoordinates(1180.0, event.getY());
-
-              //   drag = head.FindElement(event.getX(), event.getY());
-              LinX = drag.getCircleX();
-              LinY = drag.getCircleY();
-              return;
-              //  }
-            }
-
-          } else {
-            //    if(drag.ifLine()) {
-            drag.Change_Line(event.getX(), event.getY(), LinX, LinY);
-            drag.ChangeCoordinates(event.getX(), event.getY());
-
-            // drag = head.FindElement(event.getX(), event.getY());
-            LinX = drag.getCircleX();
-            LinY = drag.getCircleY();
-            return;
-
-            //    }
-
-          }
-        }
-
-      });
-      layout2.setOnMouseClicked(new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent event) {
-          drag = null;
-        }
-      });
-    }
-    return move;
-  }
-
-  public Integer vertex(){
-    TextField InputVertex = new TextField();
-
-    Button button = new Button("OK");
-
-    button.setOnAction(e -> {
-      if(isInt(InputVertex, InputVertex.getText())){
-        vertex = Integer.parseInt(InputVertex.getText());
-        System.out.println(vertex);
-        if(vertex <= 20){
-//        window.show();
-          Create_rand_Graph(vertex, table);
-
-
-        }
-      }
-    });
-
-
-
-
-    VBox newInput = new VBox(10);
-
-    newInput.setPadding(new Insets(10,10,10,10));
-    newInput.getChildren().addAll(InputVertex, button);
-
-    Scene scene3 = new Scene(newInput, 300, 250);
-    InputStage = new Stage();
-    InputStage.setScene(scene3);
-    InputStage.show();
-    return vertex;
-  }
-  public Boolean Set_element(New_Node tmp){
-    TextField InputVertex = new TextField();
-    ToggleGroup group = new ToggleGroup();
-
-    RadioButton box1 = new RadioButton("Integer");
-    RadioButton box2 = new RadioButton("Double");
-    RadioButton box3 = new RadioButton("String");
-    box1.setToggleGroup(group);
-    box2.setToggleGroup(group);
-    box3.setToggleGroup(group);
-
-    box1.setSelected(true);
-
-
-
-
-
-
-    Button button = new Button("Choose");
-
-    button.setOnAction(e -> {
-      if (box1.isSelected()) {
-        try {
-          int vertex = Integer.parseInt(InputVertex.getText());
-          if (tmp == tmphead) {
-            tmphead.setElement(vertex);
-            System.out.println(tmphead.getElement());
-
-
-          }
-          else{
-            tmpnode.setElement(vertex);
-            System.out.println(tmpnode.getElement());
-
-          }
-
-          InputStage.close();
-
-
-
-
-        } catch (NumberFormatException t) {
-          System.out.println("Error: " + InputVertex.getText() + " is a String");
-
-        }
-      } else if (box2.isSelected()) {
-        try {
-          Double vertex = Double.parseDouble(InputVertex.getText());
-          if (tmp == tmphead) {
-            tmphead.setElement(vertex);
-            System.out.println(tmphead.getElement());
-
-
-          }
-          else{
-            tmpnode.setElement(vertex);
-            System.out.println(tmpnode.getElement());
-
-          }
-          InputStage.close();
-          System.out.println(tmp.getElement());
-
-
-
-
-
-        } catch (NumberFormatException t) {
-          System.out.println("Error: " + InputVertex.getText() + " is a String");
-
-        }
-      } else if (box3.isSelected()) {
-        if (tmp == tmphead) {
-          tmphead.setElement(InputVertex.getText());
-          System.out.println(tmphead.getElement());
-
-
-        }
-        else{
-          tmpnode.setElement(InputVertex.getText());
-          System.out.println(tmpnode.getElement());
-
-        }
-        InputStage.close();
-        System.out.println(tmp.getElement());
-
-
-      }
-
-    }
-    );
-
-    VBox newInput = new VBox(10);
-
-    newInput.setPadding(new Insets(10,10,10,10));
-    newInput.getChildren().addAll(InputVertex, button, box1, box2, box3);
-
-    Scene scene3 = new Scene(newInput, 300, 250);
-    InputStage = new Stage();
-    InputStage.setScene(scene3);
-    InputStage.show();
-
-    return false;
-  }
-
-  public void Create_rand_Graph(Integer vertex, TableView table) {
-
-    Double randX, randY;
-    Integer index = 0;
-
-    if(vertex != 0){
-
-      while (index < vertex) {
-        randX = (double) (Math.random() * 1180 + 20);
-        randY = (double) (Math.random() * 831 + 49);
-
-        circle = new Circle(randX, randY, 20);
-        New_Node tmp2 = new New_Node();
-        if (this.count == 0) {
-          head = null;
-          head = new Node();
-          tmphead = new New_Node();
-          tmphead.setCircleX(randX);
-          tmphead.setCircleY(randY);
-          tmphead.setCircle(circle);
-          graph.insertNode(tmphead);
-
-
-          ObservableList<New_Node> nodes = FXCollections.observableArrayList();
-          nodes.add(new New_Node("Dell", 1049.00, 30.0));
-
-           nodes.add(new New_Node("A",10.0,10.0));
-           nodes.add(new New_Node("B",randX,randY));
-
-             tmphead.setElement("A");
-           //  tmphead.setCircleX(Double.parseDouble(priceinput.getText()));
-           //  tmphead.setCircleY(Double.parseDouble(quantityinput.getText()));
-
-           // table.setItems(nodes);
-          table.setItems(nodes);
-
-
-
-          if(wait){
-
-            ciao = new Thread(() -> {
-
-              try {
-                Thread.sleep(1500);
-              } catch (InterruptedException e) {
-                e.printStackTrace();
-              }
-
-            });
-            // ciao.join();
-            ciao.run();
-
-          }
-          layout2.getChildren().addAll(circle);
-      //    layout2.getChildren().addAll(circle);
-
-          head.AddNode(tmphead, null, count, tmphead);
-
-          tmp2 = tmphead;
-
-          this.count++;
-          this.move = false;
-          index++;
-
-        } else {
-          tmpnode = new New_Node();
-          tmpnode.setCircleX(randX);
-          tmpnode.setCircleY(randY);
-          tmpnode.setCircle(circle);
-          graph.insertNode(tmpnode);
-         /*
-          if(wait){
-            try {
-               ciao = new Thread(() -> {
-                 try {
-                   Thread.sleep(1500);
-                 } catch (InterruptedException e) {
-                   e.printStackTrace();
-                 }
-               });
-               ciao.join();
-              ciao.run();
-              layout2.getChildren().addAll(circle);
-
-            }
-            catch (Exception e) {}
-          }
-*/
-
-          if(wait){
-
-              ciao = new Thread(() -> {
-
-                  try {
-                    Thread.sleep(1500);
-                  } catch (InterruptedException e) {
-                    e.printStackTrace();
-                  }
-
-              });
-             // ciao.join();
-              ciao.run();
-
-          }
-          layout2.getChildren().addAll(circle);
-
-          head.AddNode(tmp2, tmpnode,count,tmphead);
-          tmp2 = tmpnode;
-
-         //
-          this.count++;
-          this.move = false;
-          index++;
-
-
-        }
-
-
-
-      }
-
-      if(!opened) {
-        index = 0;
-        Double control = 100 - (vertex * 4.75);
-        while (index < vertex) {
-          head.random_graph(layout2, index, control, graph, tmphead);
-          index++;
-
-        }
-      }
-
-
-    }
-
-
-  }
-  public void set_View() {
-    TableColumn<New_Node, String> namecolumn = new TableColumn<>("Name");
-    namecolumn.setMinWidth(100);
-    namecolumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-
-    //Price column
-    TableColumn<New_Node, Double> pricecolumn = new TableColumn<>("Price");
-    pricecolumn.setMinWidth(100);
-    pricecolumn.setCellValueFactory(new PropertyValueFactory<>("price"));
-
-    //Quantity column
-    TableColumn<New_Node, Double> quantitycolumn = new TableColumn<>("Quantity");
-    quantitycolumn.setMinWidth(100);
-    quantitycolumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-
-    Button addbutton = new Button("Add");
-    addbutton.setOnAction(e -> {
-      this.add = true;
-      tmpnode = new New_Node();
-      tmpnode.setElement(nameinput.getText());
-      tmpnode.setCircleX(Double.parseDouble(priceinput.getText()));
-      tmpnode.setCircleY(Double.parseDouble(quantityinput.getText()));
-      circle = new Circle(Double.parseDouble(priceinput.getText()), Double.parseDouble(quantityinput.getText()), 20);
-      layout2.getChildren().add(circle);
-
-      table.getItems().add(tmpnode);
-      nameinput.clear();
-      priceinput.clear();
-      quantityinput.clear();
-
-
-    });
-    Button deletebutton = new Button("Delete");
-    deletebutton.setOnAction(e -> {
-      this.removed = true;
-
-      EventHandler<MouseEvent> delete = mouseEvent -> removed = Removenode(mouseEvent, removed);
-      layout2.addEventHandler(MouseEvent.MOUSE_PRESSED, delete);
-
-    });
-
-
-    //Name input
-    nameinput = new TextField();
-    nameinput.setPromptText("Name");
-    nameinput.setMinWidth(100);
-
-    //Price Input
-    priceinput = new TextField();
-    priceinput.setPromptText("Price");
-
-    //Quantity Input
-    quantityinput = new TextField();
-    quantityinput.setPromptText("Quantity");
-    HBox hbox = new HBox();
-
-    hbox.setPadding(new Insets(10, 10, 10, 10));
-    hbox.setSpacing(10);
-    hbox.getChildren().addAll(nameinput, priceinput, quantityinput, addbutton, deletebutton);
-
-
-    table = new TableView();
-    table.getColumns().addAll(namecolumn, pricecolumn, quantitycolumn);
-
-    vbox = new VBox();
-    vbox.getChildren().addAll(table, hbox);
-    Scene scene4 = new Scene(vbox, 500, 400);
-    secondStage = new Stage();
-    secondStage.setScene(scene4);
-    secondStage.setX(50);
-    secondStage.setY(50);
-    secondStage.show();
-
-
-  }
-
-  private boolean isInt(TextField input, String message){
-    try{
-      int InputVertex = Integer.parseInt(input.getText());
-      if(InputVertex <= 20 ) {
-        InputStage.close();
-        return true;
-      }
-      else return false;
-    }catch(NumberFormatException e){
-      System.out.println("Error: " + message + " is not a number");
-      return false;
-    }
-  }
   public static void main(String[] args) {
     launch(args);
   }
 
-public interface AsyncCallback {
-  /**
-   * Success callback
-   */
-  void onComplete();
-  /**
-   * Error callback
-   * @param e Exception thrown by the asynchronous call
-   */
-  void onError(Exception e);
-}
+  public void CloseStage(){
 
-  /**
-   * Runs a runnable, waits a delay and finally calls the callback
-   * @param beforeRunnable Code to run before the timeout
-   * @param delay Delay after executing the runnable and before calling the callback
-   * @param callback Callback called after the delay
-   */
-  public static void setTimeout(Runnable beforeRunnable, int delay, AsyncCallback callback){
-    beforeRunnable.run();
+    if(edit.InputStage != null){
+      edit.InputStage.close();
+    }
+    if(event.DescritionStage != null){
+      event.DescritionStage.close();
 
-    new Thread(() -> {
-      try {
-        Thread.sleep(delay);
-        Platform.runLater(callback::onComplete);
-      }
-      catch (Exception e){
-        callback.onError(e);
-      }
-    }).start();
+    }
+    if(event.popup_error != null){
+      event.popup_error.close();
+    }
+    if(file.fileChooser != null){
+    }
   }
+
 }
+
+

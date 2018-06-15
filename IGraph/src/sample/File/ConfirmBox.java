@@ -1,7 +1,9 @@
-package sample;
+package sample.File;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.scene.*;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.*;
 import javafx.scene.control.*;
@@ -48,6 +50,16 @@ public class ConfirmBox {
     layout.setAlignment(Pos.CENTER);
     Scene scene = new Scene(layout);
     window.setScene(scene);
+    EventHandler<MouseEvent> NoFullscreen = mouseEvent -> {
+      window.setFullScreen(false);
+      if (window.isMaximized()) {
+        window.setMaxWidth(1200);
+        window.setMinWidth(1200);
+        window.setMaxHeight(900);
+        window.setMinHeight(900);
+      }
+    };
+    layout.addEventHandler(MouseEvent.MOUSE_MOVED, NoFullscreen);
     window.showAndWait();
 
     return answer;

@@ -1,0 +1,53 @@
+//Help Menu
+
+To Start:
+You can choose between three alternatives:
+New: Open a clean window;
+Open: Choose a txt file to create a Graph from it.
+      (Show Example.txt to see how you need to write the file)
+Generate: Create a rand Graph, the number of vertex is asked in input.
+
+During:
+You can add node, delete it, change or set element. Create a edge, delete a edge
+or change weight of a edge.
+Node:
+
+  Add node:
+    In Edit->Node->Add node:
+      click on this menu item and after choose a part of screen where you want to create
+      the node, and insert the element.
+
+  Delete node:
+    Just to right click on a node, you will see a little popup with the message "Delete Node".
+    If you click it will delete the node that were pointed.
+
+  Change/Set Element:
+    In Edit->Node->Change/Set element:
+      click on this menu item and after choose the node that you want to change/set item.
+
+
+Edge:
+
+  Add Edge:
+    In Edit->Edge->Add Edge:
+      click on this menu item and click on the couple of node where you want to create a edge;
+
+  Delete Edge:
+    In Edit->Edge->Delete Edge:
+      click on this menu item and click on the couple of node where you want to delete a edge;
+
+  Change Weight:
+    In Edit->Edge->Change Weight:
+        click on this menu item and click on the couple of node where you want to
+        change the weight;
+
+
+Help:
+
+  Show this guide again.
+
+
+End:
+
+  You can save the file on File->Save as. Or if you are closing the file a popup ask
+  if you want to save the file, so you can reopen your project when you want.

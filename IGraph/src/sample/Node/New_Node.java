@@ -1,18 +1,13 @@
 package sample.Node;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Arc;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import java.lang.Object;
 import org.apache.commons.lang3.RandomStringUtils;
-
-
 import java.util.LinkedList;
-
 import static javafx.scene.paint.Color.*;
 
 public class New_Node<T> {
@@ -21,10 +16,8 @@ public class New_Node<T> {
     private Double circleY;
     private Double circleX;
     private Circle circle;
-    private int cont = 0;
     private LinkedList<Edges> Archi;
     private VBox ElementBox;
-    //  LinkedList<Line> line_list;
 
     private Boolean connect;
 
@@ -38,11 +31,6 @@ public class New_Node<T> {
     }
 
 
-    public Boolean isempty(New_Node tmp){
-        if(tmp.Archi.isEmpty()) return true;
-        else return false;
-
-    }
     public Boolean IsElement(LinkedList<New_Node> list,String Element){
         for (New_Node node:list) {
             if(node.getElement().equals(Element)) return true;
@@ -85,13 +73,6 @@ public class New_Node<T> {
         circle = circlenew;
     }
 
-    public int getCont() {
-        return cont;
-    }
-
-    public void setCont(int cont) {
-        this.cont = cont;
-    }
 
     public void set_ElementBox(){
         Label label = new Label();
@@ -183,20 +164,23 @@ public class New_Node<T> {
     public void Remove_line(New_Node start, New_Node end, BorderPane layout) {
         Integer index = 0, ind = 0;
         Line lineToRemove, lineToRemove2;
+        LinkedList<Edges> tmplist = start.getArchi(), tmplist2 = end.getArchi();
         if (start != null && end != null) {
 
-            for (Object line : start.Archi) {
+            for (Edges line : tmplist) {
                 ind = 0;
 
-                for (Object line2 : end.Archi) {
+                for (Edges line2 : tmplist2) {
                     lineToRemove = start.Get_Line(index);
                     lineToRemove2 = end.Get_Line(ind);
 
                     if (lineToRemove == lineToRemove2 && lineToRemove != null && lineToRemove2 != null) {
 
                       //  end.Archi.
-                        end.Remove_Element(ind);
-                        start.Remove_Element(index);
+                        end.getArchi().remove(line2);
+                        start.getArchi().remove(line);
+                     //   end.Remove_Element(line2);
+                      //  start.Remove_Element(line);
                         layout.getChildren().remove(lineToRemove);
                         return;
 
@@ -210,11 +194,6 @@ public class New_Node<T> {
         }
         return;
     }
-    public void Remove_Element(Integer index){
-        System.out.println("RIMOSSO PORCODIOOOO");
-        Archi.set(index,null);
-    }
-
     public void remove_element(BorderPane layout) {
         Integer index = 0;
         Line lineToRemove;
@@ -223,7 +202,7 @@ public class New_Node<T> {
             if (Archi.get(index) != null) {
                 lineToRemove = Archi.get(index).getLine();
                 layout.getChildren().remove(lineToRemove);
-                Archi.set(index, null);
+             //   Archi.remove(index);
             }
             index++;
 
@@ -497,7 +476,7 @@ public class New_Node<T> {
     }
 
 
-    public void random_graph(BorderPane layout, Integer index, Double control,LinkedList<New_Node> list, LinkedList<Edges> kruskal){
+    public void random_graph(BorderPane layout, Integer index, Double control,LinkedList<New_Node> list, LinkedList<Edges> kruskal,Integer MaxWeight){
         New_Node tmp, tmp2;
 
         Double probability,weight;
@@ -518,7 +497,7 @@ public class New_Node<T> {
             if (!node.equals(list.get(aux))) {
                 if (node.ifLine(node, list.get(aux))){
                     if (probability <= control) {
-                        weight =  Math.random() * 20 + 1;
+                        weight =  Math.random() * MaxWeight + 1;
 
                         //add line
                         line2 = new Line();

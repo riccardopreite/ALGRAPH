@@ -15,15 +15,12 @@ public class DFS {
 
         System.out.println(list.size());
        for (Edges edge : list) {
-            System.out.println(" Element: " + edge.getNodeB().getElement());
-            if (!edge.getNodeB().getConnect()) {
+           if (!edge.getNodeB().equals(null)){
+           if (!edge.getNodeB().getConnect()) {
 
-                System.out.println("RECALL " + cont);
-                System.out.println("Element examed set true " +edge.getNodeB().getElement() + " Size of list ");
-
-                 cont =  ApplyDFS(edge.getNodeB().getArchi(),edge.getNodeB(),cont);
-            }
-
+               cont = ApplyDFS(edge.getNodeB().getArchi(), edge.getNodeB(), cont);
+           }
+       }
         }
 
 return cont;

@@ -1,100 +1,74 @@
 package sample.File;
 
-import com.sun.corba.se.spi.orbutil.fsm.Input;
+import javafx.event.EventHandler;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import sample.Edit.EditNode;
 import sample.MouseEvent.Event;
 import sample.Node.*;
-import com.sun.java.swing.action.FileMenu;
-import com.sun.org.apache.bcel.internal.generic.MONITORENTER;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.LineBuilder;
 import javafx.stage.FileChooser;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
-import jdk.internal.cmm.SystemResourcePressureImpl;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
-import sun.security.krb5.internal.crypto.Des;
-
-import java.awt.*;
-
 import java.io.*;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.rmi.server.ExportException;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import java.util.Optional;
 import static javafx.scene.paint.Color.*;
 
 
 
 public class ManageFile{
 
-  public Integer count2 = 0;
+  private Integer count2 = 0;
 
-  public  Boolean edge = false, removed = false, add = false, delete_edge = false,continue_line = true, opened = false, Elements = false;
-  Scene  scene2;
-  Stage window;
-  Circle circle;
-  Line line;
-  Integer   ind = 0,weight;
-  public New_Node forFile = null,forFile2 = null;
-  public New_Node tmphead = null,tmpnode = null;
-  public Integer vertex = 0, count_line = 0;
-  public Boolean answer = false;
-  public LinkedList<Edges> Kruskal_list;
-  public Stage InputStage = new Stage();
-  public BorderPane layout;
-  public Event event = new Event();
-  public EditNode edit = new EditNode();
-  public LinkedList<New_Node> ListNode = new LinkedList<>();
-  public Menu filemenu,editmenu,Kruskal,helpmenu;
-  public MenuBar menuBar;
-  public FileChooser fileChooser = new FileChooser();
-  public FileChooser filex = new FileChooser();
+  private  Boolean edge = false, removed = false, add = false, delete_edge = false,continue_line = true, opened = false, Elements = false;
+  private Scene  scene2;
+  private Stage window;
+  private Circle circle;
+  private Line line;
+  private Integer   ind = 0,weight;
+  private New_Node forFile = null,forFile2 = null;
+  private New_Node tmpnode = null;
+  private Integer vertex = 0, count_line = 0;
+  private Boolean answer = false;
+  private LinkedList<Edges> Kruskal_list;
+  private Stage InputStage = new Stage();
+  private BorderPane layout;
+  private Event event = new Event();
+  private EditNode edit = new EditNode();
+  private LinkedList<New_Node> ListNode = new LinkedList<>();
+  private Menu filemenu,editmenu,Kruskal,helpmenu;
+  private MenuBar menuBar;
+  private FileChooser fileChooser = new FileChooser();
+  private FileChooser filex = new FileChooser();
 
 
-  java.io.File file;
+  private File file;
   // private Desktop desktop = Desktop.getDesktop();
 
-public ManageFile(){
+  public ManageFile(){
 
-}
+  }
 
   public void SetLayout(BorderPane layout, Stage window, Scene scene,MenuBar menubar,Menu filemenu, Menu editmenu,Menu kruskal,Menu helpmenu){
 
-  this.layout = layout;
-  this.window = window;
-  this.scene2 = scene;
-  this.menuBar = menubar;
-  this.filemenu = filemenu;
-  this.editmenu = editmenu;
-  this.Kruskal = kruskal;
-  this.helpmenu = helpmenu;
+    this.layout = layout;
+    this.window = window;
+    this.scene2 = scene;
+    this.menuBar = menubar;
+    this.filemenu = filemenu;
+    this.editmenu = editmenu;
+    this.Kruskal = kruskal;
+    this.helpmenu = helpmenu;
 
   }
 
@@ -203,7 +177,6 @@ public ManageFile(){
           line_file = "";
           count_line++;
           line_file = br.readLine();
-          System.out.println(line_file);
           if (line_file != null) {
             if (line_file.equals("Vertex:")) {
               //Aggiungi vertex
@@ -219,19 +192,18 @@ public ManageFile(){
                 }
               }
               catch (Exception t){
-                event.SetError("Error!\nAlla linea: " + count_line + " c'è un errore(richesto intero, inserita stringa");
+                event.SetError("Error!\nAlla linea: " + count_line + " c'e' un errore(richesto intero, inserita stringa");
                 return;
               }
 
               opened = true;
-              Create_rand_Graph(vertex);
-              System.out.println("Vertici aggiunti");
+              Create_rand_Graph(vertex,0);
             }
 
             else if(line_file.equals("Root:")){
               ListNode.getFirst().clearLayout(layout,ListNode);
               event.SetError("Stai cercado di aprire il File di un albero!");
-          //    OpenTree();
+              //    OpenTree();
             }
             else if (line_file.equals("Elements:")) {
               Elements = true;
@@ -249,17 +221,17 @@ public ManageFile(){
                     }
                     else{
                       ListNode.get(index).setElement("NE");
-                      event.SetError("L'elemento " + line_file + " esiste già, verrà sostituito da NE.\n(E' possibile cambiarlo dopo)");
+                      event.SetError("L'elemento " + line_file + " esiste gia', verra' sostituito da NE.\n(E' possibile cambiarlo dopo)");
                     }
 
 
                   }
-                ListNode.get(index).set_ElementBox();
-                layout.getChildren().add(ListNode.get(index).get_ElementBox());
-                index++;
-              }
-              line_file = br.readLine();
-              count_line++;
+                  ListNode.get(index).set_ElementBox();
+                  layout.getChildren().add(ListNode.get(index).get_ElementBox());
+                  index++;
+                }
+                line_file = br.readLine();
+                count_line++;
 
               }
               //while col numero di nodi preso prima, ignora le restanti righe fino agli archi
@@ -272,19 +244,18 @@ public ManageFile(){
                 if (!ListNode.isEmpty()) {
                   for (New_Node node: ListNode) {
                     if(node.getElement().equals(""))
-                      node.setElement("NE");
+                    node.setElement("NE");
                   }
                 }
               }
-            else  if(!Elements){
+              else  if(!Elements){
                 for (New_Node node : ListNode) {
                   node.setElement("NE");
                 }
-             //   break;
+                //   break;
               }
               do {
                 word = br.read();
-                System.out.println((char)word);
                 if ((char) word != ';' && word != -1) {
                   if ((char) word != '\n') {
                     aux_edge = "";
@@ -295,45 +266,43 @@ public ManageFile(){
                       word = br.read();
                     }
                     if((char)word != '-'){
-                      event.SetError("Error!\nAlla linea " + count_line + " il carattere '-' non è attaccato fra i due nodi, la linea non verrà creata");
+                      event.SetError("Error!\nAlla linea " + count_line + " il carattere '-' non e' attaccato fra i due nodi, la linea non verra' creata");
                       continue_line = false;
                     }
                     if(continue_line){
-                    edge1 = aux_edge;
-                    if ((char) word != '\n') {
-                      aux_edge = "";
-                      word = br.read();
-                      while ((char) word != '/' && (char) word != '\n') {
-                        if((char)word != ' ') {
-                          aux_edge = aux_edge + (char) word;
-                        }
+                      edge1 = aux_edge;
+                      if ((char) word != '\n') {
+                        aux_edge = "";
                         word = br.read();
-                      }
-                      edge2 = aux_edge;
-                      aux_edge = "";
-                      if ((char) word == '/') {
-                        word = br.read();
-                        while ((char) word != '\n') {
-                          aux_edge = aux_edge + (char) word;
+                        while ((char) word != '/' && (char) word != '\n') {
+                          if((char)word != ' ') {
+                            aux_edge = aux_edge + (char) word;
+                          }
                           word = br.read();
                         }
-                        weight = Integer.parseInt(aux_edge);
-                      } else {
-                        Alert warn = new Alert(Alert.AlertType.WARNING);
-                        warn.setHeaderText("Warning!\nAlla linea " + count_line + "il peso non è presente.\nSarà geherato random. ");
-                        warn.showAndWait();
-                        weight = (int) Math.random() * 20 + 1;
+                        edge2 = aux_edge;
+                        aux_edge = "";
+                        if ((char) word == '/') {
+                          word = br.read();
+                          while ((char) word != '\n') {
+                            aux_edge = aux_edge + (char) word;
+                            word = br.read();
+                          }
+                          weight = Integer.parseInt(aux_edge);
+                        } else {
+                          Alert warn = new Alert(Alert.AlertType.WARNING);
+                          warn.setHeaderText("Warning!\nAlla linea " + count_line + "il peso non e' presente.\nSara' generato random. ");
+                          warn.showAndWait();
+                          weight = (int) Math.random() * 20 + 1;
+                        }
+                        if ((ListNode.getFirst().IsElement(ListNode, edge1)) && (ListNode.getFirst().IsElement(ListNode, edge2)) && edge1 != edge2 && (!edge1.equals("NE")) && (!edge2.equals("NE"))) {
+                          forFile = ListNode.getFirst().returnNode_element(edge1, ListNode);
+                          forFile2 = ListNode.getFirst().returnNode_element(edge2, ListNode);
+                          ListNode.getFirst().File_line(forFile, forFile2, layout, weight, Kruskal_list);
+                        } else {
+                          event.SetError("L'arco scelto tra " + edge1 + "<->" + edge2 + " non puo' essere creato");
+                        }
                       }
-                      if ((ListNode.getFirst().IsElement(ListNode, edge1)) && (ListNode.getFirst().IsElement(ListNode, edge2)) && edge1 != edge2 && (!edge1.equals("NE")) && (!edge2.equals("NE"))) {
-                        System.out.println("edge1: " + edge1 + " edge2: " + edge2 + " W: " + weight);
-                        forFile = ListNode.getFirst().returnNode_element(edge1, ListNode);
-                        forFile2 = ListNode.getFirst().returnNode_element(edge2, ListNode);
-                        System.out.println("PESO : " + aux_edge);
-                        ListNode.getFirst().File_line(forFile, forFile2, layout, weight, Kruskal_list);
-                      } else {
-                        event.SetError("L'arco scelto tra " + edge1 + "<->" + edge2 + " non può essere creato");
-                      }
-                    }
                     }
                     continue_line = true;
                   }
@@ -342,13 +311,11 @@ public ManageFile(){
 
               }
               while ((char) word != ';' && word != -1);
-              //Prende i numeri dei nodi e crea un arco fra loro, se un arco già esiste non lo ricrea
-              System.out.println("Edges added");
+              //Prende i numeri dei nodi e crea un arco fra loro, se un arco gia' esiste non lo ricrea
             }
           }
         }
         while (line_file != null);
-      //  event.SetHead(this.head, this.tmphead, this.vertex);
 
         // event.SetHead(this.tmphead,this.head);
       }
@@ -367,33 +334,57 @@ public ManageFile(){
 
   public Integer vertex(){
     TextField InputVertex = new TextField();
-//    InputVertex.setPromptText("Insert Number of Vertex");
-    InputVertex.setText("Inserisci il numero di Vertici:");
-    Button button = new Button("Inserisci");
-    button.setOnAction(e -> {
-      if(edit.isInt(InputVertex, InputVertex.getText(),InputStage,true)){
-        vertex = Integer.parseInt(InputVertex.getText());
+    TextField MaxWeight = new TextField();
+    //    InputVertex.setPromptText("Insert Number of Vertex");
+    InputVertex.setText("Inserisci il numero di Vertici:(Max 10)");
+    MaxWeight.setText("Inserisci il peso massimo:(Max 100)");
 
-        System.out.println(vertex);
+    Button Insert = new Button("Inserisci");
+    Button Cancel = new Button("Annulla");
 
-        if(vertex <= 10 && vertex > 0){
-          InputStage.close();
-          Create_rand_Graph(vertex);
-        }
 
-        else{
-          event.SetError("Per la generazione random inserire da 1 10 nodi!\nSarà comunque possibile modificarlo dopo.");
-        }
-      }
-    });
     VBox newInput = new VBox(10);
 
     newInput.setPadding(new Insets(10,10,10,10));
-    newInput.getChildren().addAll(InputVertex, button);
+    newInput.getChildren().addAll(InputVertex,MaxWeight, Insert,Cancel);
     if(InputStage != null){
       InputStage.close();
     }
     Scene scene3 = new Scene(newInput, 300, 250);
+    scene3.setOnKeyPressed(new EventHandler<KeyEvent>() {
+      @Override
+      public void handle(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+          Insert.fire();
+        }
+      }
+    });
+
+    Insert.setOnAction(e -> {
+      if(edit.isInt(InputVertex, InputVertex.getText(),InputStage,true)) {
+        vertex = Integer.parseInt(InputVertex.getText());
+        if(edit.isInt(MaxWeight, MaxWeight.getText(),InputStage,true)) {
+          weight = Integer.parseInt(MaxWeight.getText());
+          if (vertex <= 10 && vertex > 0) {
+            if(weight > 0 && weight <= 100 ) {
+              opened = false;
+              Create_rand_Graph(vertex, weight);
+              InputStage.close();
+
+            }
+            else{
+              event.SetError("Inserire un peso > 0 e <= 100!");
+            }
+          }
+          else{event.SetError("Per la generazione random inserire da 1 10 nodi!\nSara' comunque possibile modificarlo dopo.");
+          }
+        }
+      }
+    });
+
+    Cancel.setOnAction(e -> {
+      InputStage.close();
+    });
 
     InputStage.setScene(scene3);
     InputStage.showAndWait();
@@ -401,7 +392,7 @@ public ManageFile(){
   }
 
 
-  public void Create_rand_Graph(Integer vertex) {
+  public void Create_rand_Graph(Integer vertex,Integer MaxWeight) {
 
     Double randX, randY;
     Integer index = 0;
@@ -418,22 +409,22 @@ public ManageFile(){
           //Aggiungere controllo per i bordi
           while (ListNode.getFirst().FindElement(randX, randY, ListNode) != null );
 
-            circle = new Circle(randX, randY, 20);
-            tmpnode = new New_Node();
-            ListNode.add(index, tmpnode);
-            ListNode.get(index).setCircleX(randX);
-            ListNode.get(index).setCircleY(randY);
-            ListNode.get(index).setCircle(circle);
+          circle = new Circle(randX, randY, 20);
+          tmpnode = new New_Node();
+          ListNode.add(index, tmpnode);
+          ListNode.get(index).setCircleX(randX);
+          ListNode.get(index).setCircleY(randY);
+          ListNode.get(index).setCircle(circle);
 
 
-            if (!opened) {
-              ListNode.get(index).setElement(ListNode.get(index).setRandELement(ListNode));
-              ListNode.get(index).set_ElementBox();
-              layout.getChildren().addAll(circle, ListNode.get(index).get_ElementBox());
-            } else layout.getChildren().addAll(circle);
-            index++;
-          }
-          else{
+          if (!opened) {
+            ListNode.get(index).setElement(ListNode.get(index).setRandELement(ListNode));
+            ListNode.get(index).set_ElementBox();
+            layout.getChildren().addAll(circle, ListNode.get(index).get_ElementBox());
+          } else layout.getChildren().addAll(circle);
+          index++;
+        }
+        else{
           randX = (Math.random() * 1180 + 20);
           randY = (Math.random() * 831 + 49);
           circle = new Circle(randX, randY, 20);
@@ -456,24 +447,24 @@ public ManageFile(){
         index = 0;
         Double control = 100 - (vertex * 4.75);
         while (index < vertex) {
-          ListNode.getFirst().random_graph(layout, index, control, ListNode,Kruskal_list);
+          ListNode.getFirst().random_graph(layout, index, control, ListNode,Kruskal_list,MaxWeight);
           index++;
         }
       }
     }
-   // event.SetHead(this.head, this.tmphead, this.vertex);
+    // event.SetHead(this.head, this.tmphead, this.vertex);
     //Endo Of Rand Graph
   }
 
   //Save File
 
   public void SaveFile(Integer vertex) {
-     Stage stage = new Stage();
+    Stage stage = new Stage();
     // filex.showSaveDialog(stage);
     String message = "";
     String name = null;
     filex.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Txt", "*.txt")
+    new FileChooser.ExtensionFilter("Txt", "*.txt")
     );
     File file = new File(String.valueOf(filex.showSaveDialog(stage)));
 
@@ -500,20 +491,21 @@ public ManageFile(){
       WriteOnFIle.println(vertex);
       index = 0;
       WriteOnFIle.println("Elements:");
-      if(!ListNode.isEmpty()){
-      for (New_Node node : ListNode) {
-        WriteOnFIle.println(node.getElement());
+      if (!ListNode.isEmpty()) {
+        for (New_Node node : ListNode) {
+          WriteOnFIle.println(node.getElement());
 
+        }
       }
-    }
       WriteOnFIle.println("Edges:");
       ind = 0;
-      for (Edges edge : Kruskal_list) {
-        message = message + edge.getNodeA().getElement() + "-" + edge.getNodeB().getElement() + "/" + edge.getWeight() + "\n";
+      if(!Kruskal_list.isEmpty()){
+        for (Edges edge : Kruskal_list) {
+          message = message + edge.getNodeA().getElement() + "-" + edge.getNodeB().getElement() + "/" + edge.getWeight() + "\n";
+        }
       }
       WriteOnFIle.println(message);
       WriteOnFIle.println(";");
-      System.out.println("File saved!");
 
     }
   }
@@ -524,6 +516,8 @@ public ManageFile(){
 
   public void ReprintGraph(BorderPane layout) {
     LinkedList<Edges> EDGE;
+    window.setTitle("ALGRAPH");
+
     for (New_Node node : ListNode) {
       node.setConnect(false);
 
@@ -558,7 +552,7 @@ public ManageFile(){
 
 
   public  void closeProgram() {
-    answer = ConfirmBox.display("Warning!!!", "Do you want to save the file?");
+    answer = ConfirmBox.display("Attenzione!!!", "Vuoi salvare il File?(Invio:Si/Esc:no)");
 
 
     if (answer) {
@@ -570,10 +564,111 @@ public ManageFile(){
 
     }
     else{
+      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+      alert.setHeaderText("Sei Sicuro di voler Uscire?");
 
-      window.close();
+      Optional<ButtonType> result = alert.showAndWait();
+      if(result.get() == ButtonType.OK) {
+        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        window.close();
+      }
+      else return;
     }
 
 
+  }
+
+
+  public LinkedList<New_Node> deleteElement(New_Node node){
+    LinkedList<Edges> tmplist;
+    Integer index = 0;
+    for (New_Node Node:ListNode) {
+      if(!Node.equals(node)){
+        tmplist = Node.getArchi();
+        index = 0;
+        while(index < tmplist.size()){
+          if(tmplist.get(index).getNodeB().equals(node)){
+            Node.getArchi().remove(tmplist.get(index));
+
+          }
+          index++;
+        }
+
+      }
+
+    }
+    ListNode.remove(node);
+    return ListNode;
+  }
+  public LinkedList<Edges> deleteEdge(New_Node selected) {
+    LinkedList<Edges> tmplist = Kruskal_list;
+    Integer index = 0;
+    while(index < tmplist.size()){
+      if(tmplist.get(index).getNodeB().equals(selected) || tmplist.get(index).getNodeA().equals(selected)) {
+
+        Kruskal_list.remove(tmplist.get(index));
+      }
+      index++;
+    }
+    //  Kruskal_list = tmplist;
+return Kruskal_list;
+  }
+
+
+  public Event getEvent() {
+    return event;
+  }
+
+  public void setEvent(Event event) {
+    this.event = event;
+  }
+
+  public Integer getVertex() {
+    return vertex;
+  }
+
+  public void setVertex(Integer vertex) {
+    this.vertex = vertex;
+  }
+
+  public LinkedList<Edges> getKruskal_list() {
+    return Kruskal_list;
+  }
+
+  public void setKruskal_list(LinkedList<Edges> kruskal_list) {
+    Kruskal_list = kruskal_list;
+  }
+
+  public Stage getInputStage() {
+    return InputStage;
+  }
+
+  public void setInputStage(Stage inputStage) {
+    InputStage = inputStage;
+  }
+
+  public BorderPane getLayout() {
+    return layout;
+  }
+
+  public void setLayout(BorderPane layout) {
+    this.layout = layout;
+  }
+
+  public LinkedList<New_Node> getListNode() {
+    return ListNode;
+  }
+
+  public void setListNode(LinkedList<New_Node> listNode) {
+    ListNode = listNode;
+  }
+
+
+  public Stage getWindow() {
+    return window;
+  }
+
+  public void setWindow(Stage window) {
+    this.window = window;
   }
 }

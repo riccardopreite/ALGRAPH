@@ -1,8 +1,12 @@
 package sample;
+import javafx.event.EventHandler;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import sample.Edit.EditNode;
 import sample.File.ConfirmBox;
 import sample.File.ManageFile;
-import sample.Kruskal;
+import sample.Kruskal.*;
 import sample.MouseEvent.Event;
 import javafx.geometry.Insets;
 import javafx.scene.control.Menu;
@@ -15,11 +19,14 @@ import javafx.stage.Stage;
 import sample.Node.DFS;
 import sample.Node.Edges;
 import sample.Node.New_Node;
+import sun.misc.ExtensionInstallationException;
 
 import javax.swing.*;
 import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Path;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +44,7 @@ public class Main extends Application {
 
   JFrame window2;
   public BorderPane layout, layout2;
-   ManageFile file = new ManageFile();
+  ManageFile file = new ManageFile();
   Kruskal krus = new Kruskal();
   Event event = new Event();
   EditNode edit = new EditNode();
@@ -49,19 +56,18 @@ public class Main extends Application {
 
 
   public void start(Stage primaryStage) throws Exception {
-    System.out.println("sono vivo");
 
     layout = new BorderPane();
     layout2 = new BorderPane();
 
 
     window = primaryStage;
-    window.setTitle("making Menux");
+    window.setTitle("WELCOME");
 
     //File menu
 
 
-     filemenu = new Menu("File");
+    filemenu = new Menu("File");
     window.setOnCloseRequest(e -> {
 
       e.consume();
@@ -69,17 +75,21 @@ public class Main extends Application {
     });
 
 
-     newfile = new MenuItem("New");
+    newfile = new MenuItem("Nuovo");
     newfile.setOnAction(e -> {
-      CloseStage();
+              CloseStage();
+
       file.NewFile();
+      window.setTitle("ALGRAPH");
+
       event.SetManageFile(file);
-      event.file.tmphead = file.tmphead;
       edit.SetManageFile(file);
       event.SetEdit(edit);
-      event.adding = false;
-      event.setting = false;
-      event.FoundEdge = false;
+      event.setAdding(false);
+      event.setSetting(false);
+      event.setFoundEdge(false);
+      event.SetCombinationKey(scene2);
+
       if (count == 0) {
         filemenu.getItems().removeAll(newfile, openfile, randomfile, exitfile);
         filemenu.getItems().addAll(newfile, openfile, savefile, randomfile, exitfile);
@@ -92,6 +102,14 @@ public class Main extends Application {
         event.DeleteNode();
 
       }
+      else{
+        try{
+          menuBar.getMenus().clear();
+          menuBar.getMenus().addAll(filemenu, editmenu, Kruskal, helpmenu);
+          layout2.setTop(menuBar);
+        }
+        catch(Exception t){}
+      }
 
 
 
@@ -99,17 +117,20 @@ public class Main extends Application {
     });
 
 
-     openfile = new MenuItem("Open");
+    openfile = new MenuItem("Apri");
     openfile.setOnAction(e -> {
       CloseStage();
+
+
       file.Openfile();
+      window.setTitle("ALGRAPH");
+
       event.SetManageFile(file);
-      event.file.tmphead = file.tmphead;
       edit.SetManageFile(file);
       event.SetEdit(edit);
-      event.adding = false;
-      event.setting = false;
-      event.FoundEdge = false;
+      event.setAdding(false);
+      event.setSetting(false);
+      event.setFoundEdge(false);
       if (count == 0) {
         count++;
         filemenu.getItems().removeAll(newfile, openfile, randomfile, exitfile);
@@ -122,33 +143,52 @@ public class Main extends Application {
         event.DeleteNode();
 
       }
+      else{
+        try{
+          menuBar.getMenus().clear();
+          menuBar.getMenus().addAll(filemenu, editmenu, Kruskal, helpmenu);
+          layout2.setTop(menuBar);
+        }
+        catch(Exception t){}
+      }
+      event.SetCombinationKey(scene2);
+
 
 
 
 
     });
 
-     savefile = new MenuItem("Save As");
+    savefile = new MenuItem("Salva come..");
     savefile.setOnAction(e -> {
       CloseStage();
 
-      file.SaveFile(file.vertex);
+      file.SaveFile(file.getVertex());
     });
 
 
-     randomfile = new MenuItem("Generate random");
+    randomfile = new MenuItem("Genera random");
     randomfile.setOnAction(e -> {
       CloseStage();
+
+
+
       file.Random();
+      window.setTitle("ALGRAPH");
+
       event.SetManageFile(file);
-      event.file.tmphead = file.tmphead;
       edit.SetManageFile(file);
       event.SetEdit(edit);
-      event.adding = false;
-      event.setting = false;
-      event.FoundEdge = false;
+
+      event.setAdding(false);
+      event.setSetting(false);
+      event.setFoundEdge(false);
+      event.SetCombinationKey(scene2);
+
+
       if (count == 0) {
         count++;
+        menuBar.getMenus().clear();
         filemenu.getItems().removeAll(newfile, openfile, randomfile, exitfile);
         filemenu.getItems().addAll(newfile, openfile, savefile, randomfile, exitfile);
         menuBar.getMenus().removeAll(filemenu, helpmenu);
@@ -159,16 +199,24 @@ public class Main extends Application {
         event.DeleteNode();
 
       }
+      else{
+        try{
+          menuBar.getMenus().clear();
+          menuBar.getMenus().addAll(filemenu, editmenu, Kruskal, helpmenu);
+          layout2.setTop(menuBar);
+        }
+        catch(Exception t){}
+      }
     });
 
-     exitfile = new MenuItem("Exit");
+    exitfile = new MenuItem("Esci");
     exitfile.setOnAction(e -> {
 
       e.consume();
       file.closeProgram();
       try {
         window2.setDefaultCloseOperation(
-                JFrame.EXIT_ON_CLOSE);
+        JFrame.EXIT_ON_CLOSE);
         window2.dispatchEvent(new WindowEvent(window2, WindowEvent.WINDOW_CLOSING));
       } catch (Exception t) {
       }
@@ -178,20 +226,20 @@ public class Main extends Application {
 
 
     //Edit menu
-     editmenu = new Menu("Edit");
+    editmenu = new Menu("Modifica");
 
-    Menu Node = new Menu("Node");
-    Menu Edge = new Menu("Edge");
+    Menu Node = new Menu("Nodo");
+    Menu Edge = new Menu("Arco");
 
 
     //Add Node
-    MenuItem Addnode = new MenuItem("Add Node");
+    MenuItem Addnode = new MenuItem("Aggiungi Nodo");
     Addnode.setOnAction(e -> {
       CloseStage();
-      event.file.tmphead = file.tmphead;
-      event.adding = true;
-      event.setting = false;
-      event.FoundEdge = false;
+
+      event.setAdding(true);
+      event.setSetting(false);
+      event.setFoundEdge(false);
       event.AddNode();
 
 
@@ -199,53 +247,55 @@ public class Main extends Application {
 
 
     //Set Element
-    MenuItem setElement = new MenuItem("Add/Change Element");
+    MenuItem setElement = new MenuItem("Modifica Elemento");
 
     setElement.setOnAction(e -> {
       CloseStage();
 
-      event.file.tmphead = file.tmphead;
-      event.setting = true;
-      event.FoundEdge = false;
-      event.adding = false;
+
+      event.setAdding(false);
+      event.setSetting(true);
+      event.setFoundEdge(false);
       event.SetElement();
     });
 
 
     //Add Edge
-    MenuItem Add_Edge = new MenuItem("Add Edge");
+    MenuItem Add_Edge = new MenuItem("Aggiungi Arco");
     Add_Edge.setOnAction(e -> {
       CloseStage();
 
-      event.file.tmphead = file.tmphead;
-      event.FoundEdge = true;
-      event.adding = false;
-      event.setting = false;
+
+      event.setAdding(false);
+      event.setSetting(false);
+      event.setFoundEdge(true);
       event.SetControl(0);
       event.GetEdge(0);
 
     });
 
+    //Delete Edge
 
-    MenuItem DeleteEdge = new MenuItem("Delete Edge");
+    MenuItem DeleteEdge = new MenuItem("Elimina Arco");
     DeleteEdge.setOnAction(e -> {
       CloseStage();
 
-      event.file.tmphead = file.tmphead;
-      event.FoundEdge = true;
-      event.adding = false;
-      event.setting = false;
+      event.setAdding(false);
+      event.setSetting(false);
+      event.setFoundEdge(true);
       event.SetControl(1);
       event.GetEdge(1);
     });
-    MenuItem ChangeWeight = new MenuItem("Change Weight");
+
+    //Change Weight
+    MenuItem ChangeWeight = new MenuItem("Modifica Peso");
     ChangeWeight.setOnAction(e -> {
       CloseStage();
 
-      event.file.tmphead = file.tmphead;
-      event.FoundEdge = true;
-      event.adding = false;
-      event.setting = false;
+
+      event.setAdding(false);
+      event.setSetting(false);
+      event.setFoundEdge(true);
       event.SetControl(2);
       event.GetEdge(2);
 
@@ -255,24 +305,32 @@ public class Main extends Application {
     Node.getItems().addAll(Addnode, setElement);
     Edge.getItems().addAll(Add_Edge, DeleteEdge, ChangeWeight);
 
-     Kruskal = new Menu("Option");
+
+    //Kruskal
+    Kruskal = new Menu("Opzioni");
     MenuItem doKruskal = new MenuItem("Kruskal");
     doKruskal.setOnAction(e -> {
 
       CloseStage();
-      event.adding = false;
-      event.setting = false;
-      event.FoundEdge = false;
+      window.setTitle("KRUSKAL");
+
+      event.setAdding(false);
+      event.setSetting(false);
+      event.setFoundEdge(false);
       krus.SetManageFile(file);
-      krus.UsingKruskal(file.layout, scene2);
+      krus.UsingKruskal(file.getLayout(), scene2);
 
     });
 
     Kruskal.getItems().addAll(doKruskal);
     //Help menu
-     helpmenu = new Menu("Help");
-    MenuItem Help = new MenuItem("Show Help Menu");
+    helpmenu = new Menu("Aiuto");
+    MenuItem Help = new MenuItem("Guida");
     Help.setOnAction(e -> {
+
+      event.setAdding(false);
+      event.setSetting(false);
+      event.setFoundEdge(false);
       if(!open) {
         HelpMenu();
         open = true;
@@ -286,11 +344,12 @@ public class Main extends Application {
 
 
     //Main menu bar
-     menuBar = new MenuBar();
+    menuBar = new MenuBar();
     filemenu.getItems().addAll(newfile, openfile, randomfile, exitfile);
 
     menuBar.getMenus().addAll(filemenu, helpmenu);
     layout.setTop(menuBar);
+    window.getIcons().add(new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("./sample/icon.png")));
 
     scene1 = new Scene(layout, 300, 350);
     window.setScene(scene1);
@@ -299,17 +358,20 @@ public class Main extends Application {
     layout2.setStyle("-fx-background-color: rgba(100, 100, 100, 0.5);");
 
     file.SetLayout(layout2, window, scene2,menuBar,filemenu,editmenu,Kruskal,helpmenu);
-    event.SetLayout(layout2, window, scene2);
+    event.SetLayout(layout2, window,scene1,savefile,openfile,newfile,Help,randomfile,doKruskal);
     edit.SetLayout(layout2, window, scene2);
 
-
     layout.setStyle("-fx-background-color: rgba(100, 100, 100, 0.5);");
-
+    window.setX(150);
+    window.setY(50);
+    event.SetCombinationKey();
     window.show();
 
 
   }
 
+
+  //Open Helpmenu
   public void HelpMenu(){
     help = new File("Guide.txt");
     try {
@@ -331,18 +393,18 @@ public class Main extends Application {
     } catch (IOException e) {
       System.out.println(e.getMessage());
     }
-          window2 = new JFrame("Help");
-          final JTextArea textArea;
-          textArea = new JTextArea(10, 20);
-          JScrollPane scroll = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-          textArea.setText(HelpMenumessage);
-          textArea.setEditable(false);
-          textArea.setLineWrap(true);
-          textArea.setWrapStyleWord(true);
-          window2.add(scroll);
-          window2.setSize(630, 500);
-          window2.setVisible(true);
-          window2.setLocationRelativeTo(null);
+    window2 = new JFrame("Help");
+    final JTextArea textArea;
+    textArea = new JTextArea(10, 20);
+    JScrollPane scroll = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    textArea.setText(HelpMenumessage);
+    textArea.setEditable(false);
+    textArea.setLineWrap(true);
+    textArea.setWrapStyleWord(true);
+    window2.add(scroll);
+    window2.setSize(630, 500);
+    window2.setVisible(true);
+    window2.setLocationRelativeTo(null);
 
 
   }
@@ -355,20 +417,17 @@ public class Main extends Application {
 
   public void CloseStage(){
 
-    if(edit.InputStage != null){
-      edit.InputStage.close();
+    if(edit.getInputStage() != null){
+      edit.getInputStage().close();
     }
-    if(event.DescritionStage != null){
-      event.DescritionStage.close();
+    if(event.getDescritionStage() != null){
+      event.getDescritionStage().close();
 
     }
-    if(event.popup_error != null){
-      event.popup_error.close();
-    }
-    if(file.fileChooser != null){
-    }
+
   }
 
+
+
+
 }
-
-

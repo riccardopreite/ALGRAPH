@@ -3,6 +3,8 @@ import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.*;
 import javafx.scene.control.Button;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.*;
@@ -60,6 +62,23 @@ public class ConfirmBox {
       }
     };
     layout.addEventHandler(MouseEvent.MOUSE_MOVED, NoFullscreen);
+
+    scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+      @Override
+      public void handle(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+          yesbutton.fire();
+        }
+      }
+    });
+    scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+      @Override
+      public void handle(KeyEvent event) {
+        if (event.getCode() == KeyCode.ESCAPE) {
+          nobutton.fire();
+        }
+      }
+    });
     window.showAndWait();
 
     return answer;

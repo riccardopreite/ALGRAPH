@@ -1,53 +1,48 @@
-//Help Menu
+// Menù Help
 
-To Start:
-You can choose between three alternatives:
-New: Open a clean window;
-Open: Choose a txt file to create a Graph from it.
-      (Show Example.txt to see how you need to write the file)
-Generate: Create a rand Graph, the number of vertex is asked in input.
+Come iniziare:
+Si può scegliere tra tre alternative:
+New: Apre una nuova finestra;
+Open: Selezionare un file .txt per creare un Grafo con i dettagli del documento. 
+      (Leggere Example.txt per vedere come scrivere un file di input)
+Generate: Crea un Grafo random, specificando solamente il numero di vertici, richiesto    
+          come input.
 
-During:
-You can add node, delete it, change or set element. Create a edge, delete a edge
-or change weight of a edge.
+
+Come usare il programma:
+È possibile aggiungere, eliminare nodi o cambiare il valore degli elementi che contengono. Creare, cancellare gli archi o cambiarne il peso. Praticamente, è possibile cambiare in qualsiasi momento la struttura da visualizzare.
+
 Node:
-
-  Add node:
-    In Edit->Node->Add node:
-      click on this menu item and after choose a part of screen where you want to create
-      the node, and insert the element.
-
-  Delete node:
-    Just to right click on a node, you will see a little popup with the message "Delete Node".
-    If you click it will delete the node that were pointed.
-
-  Change/Set Element:
-    In Edit->Node->Change/Set element:
-      click on this menu item and after choose the node that you want to change/set item.
-
+Add Node: 
+   Edit->Node->Add Node: questa opzione permette di scegliere la parte di schermo dove
+   			 si vuole inserire il nodo, poi fornisce l'opzione tramite pop-up 
+			 di scegliere il valore dell'elemento e creare il nodo.
+Delete Node: l'opzione di cancellazione del nodo viene azionata con il click del tasto 
+             destro del mouse sul nodo che si vuole eliminare con la comparsa di una 
+             finestra di dialogo.
+Change/Set Element: 
+   Edit->Node->Change/Set element: voce di menù che permette di scegliere un nodo e 
+				   cambiarne il valore dell'elemento nella finestra che 
+ 				   compare sullo schermo.
 
 Edge:
-
   Add Edge:
-    In Edit->Edge->Add Edge:
-      click on this menu item and click on the couple of node where you want to create a edge;
+    Edit->Edge->Add Edge: voce di menù che crea un arco tra due nodi selezionati. 
+   			  In poche parole scegliete i nodi tra cui creare l'arco e 
+			  inserite il valore del peso nella finestra di dialogo.
 
   Delete Edge:
-    In Edit->Edge->Delete Edge:
-      click on this menu item and click on the couple of node where you want to delete a edge;
+    Edit->Edge->Delete Edge: stesso funzionamento di Add Edge, si seleziona la coppia 
+			     di nodi di cui si vuole cancellare l'arco.
 
   Change Weight:
-    In Edit->Edge->Change Weight:
-        click on this menu item and click on the couple of node where you want to
-        change the weight;
-
+    Edit->Edge->Change Weight: simile alle altre opzione di modifica degli archi: 
+			       scegliere i nodi per specificare l'arco di cui si vuole
+			       modificare il peso e cambiare il valore nella finestra 
+			       di dialogo.
 
 Help:
+Mostra nuovamente la guida.
 
-  Show this guide again.
-
-
-End:
-
-  You can save the file on File->Save as. Or if you are closing the file a popup ask
-  if you want to save the file, so you can reopen your project when you want.
+Come chiudere:
+Il file può essere salvato in File->Save As, o chiudendo la finestra del programma verrà visualizzata una finestra di dialogo che consente di scegliere se salvare il file prima di chiudere. Una volta salvato, è possibile riaprirlo e modificarlo nuovamente, e ovviamente salvare la nuova versione.

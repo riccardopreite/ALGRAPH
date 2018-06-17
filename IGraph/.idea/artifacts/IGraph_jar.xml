@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="IGraph:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/IGraph_jar</output-path>
+    <root id="archive" name="IGraph.jar">
+      <element id="module-output" name="IGraph" />
+    </root>
+  </artifact>
+</component>

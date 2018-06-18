@@ -15,12 +15,12 @@ public class DFS {
 
         System.out.println(list.size());
        for (Edges edge : list) {
-           if (!edge.getNodeB().equals(null)){
+
            if (!edge.getNodeB().getConnect()) {
 
                cont = ApplyDFS(edge.getNodeB().getArchi(), edge.getNodeB(), cont);
            }
-       }
+
         }
 
 return cont;

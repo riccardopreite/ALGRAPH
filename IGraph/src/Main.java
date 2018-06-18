@@ -1,3 +1,4 @@
+import javafx.fxml.FXMLLoader;
 import javafx.scene.image.Image;
 import Edit.EditNode;
 import File.ManageFile;
@@ -18,26 +19,28 @@ import java.net.MalformedURLException;
 
 
 public class Main extends Application {
-  public Integer count = 0;
+  private Integer count = 0;
 
-  Scene scene1, scene2;
-  Stage window;
-  public Boolean open = false;
+  private Scene scene1, scene2;
+  private Stage window;
+  private Boolean open = false;
 
-  JFrame window2;
-  public BorderPane layout, layout2;
-  ManageFile file = new ManageFile();
-  Kruskal krus = new Kruskal();
-  Event event = new Event();
-  EditNode edit = new EditNode();
-  File help ;
-  String HelpMenumessage ="",auxline;
-  public MenuItem newfile,openfile,savefile,randomfile,exitfile;
-  public Menu filemenu,editmenu,Kruskal,helpmenu;
-  public MenuBar menuBar;
+  private JFrame window2;
+  private BorderPane layout, layout2;
+  private ManageFile file = new ManageFile();
+  private Kruskal krus = new Kruskal();
+  private Event event = new Event();
+  private EditNode edit = new EditNode();
+  private File help ;
+  private String HelpMenumessage ="",auxline;
+  private MenuItem newfile,openfile,savefile,randomfile,exitfile;
+  private Menu filemenu,editmenu,Kruskal,helpmenu;
+  private MenuBar menuBar;
 
 
-  public void start(Stage primaryStage) throws Exception {
+  public void start(Stage primaryStage){
+
+
 
     layout = new BorderPane();
     layout2 = new BorderPane();
@@ -319,7 +322,8 @@ public class Main extends Application {
       }
 
       window2.toFront();
-      window2.show();
+      window2.setVisible(true);
+      //window2.show();
 
     });
     helpmenu.getItems().addAll(Help);
@@ -331,10 +335,9 @@ public class Main extends Application {
 
     menuBar.getMenus().addAll(filemenu, helpmenu);
     layout.setTop(menuBar);
-    window.getIcons().add(new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("./icon.png")));
+    window.getIcons().add(new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("icon.png")));
 
-    scene1 = new Scene(layout, 300, 350);
-    window.setScene(scene1);
+
 
     scene2 = new Scene(layout2, 1200, 900);
     layout2.setStyle("-fx-background-color: rgba(100, 100, 100, 0.5);");
@@ -346,7 +349,10 @@ public class Main extends Application {
     layout.setStyle("-fx-background-color: rgba(100, 100, 100, 0.5);");
     window.setX(150);
     window.setY(50);
-    event.SetCombinationKey();
+
+
+    scene1 = new Scene(layout, 300, 350);
+    window.setScene(scene1);
     window.show();
 
 
@@ -375,7 +381,7 @@ public class Main extends Application {
     } catch (IOException e) {
       System.out.println(e.getMessage());
     }
-    window2 = new JFrame("Help");
+    window2 = new JFrame("Guida");
     final JTextArea textArea;
     textArea = new JTextArea(10, 20);
     JScrollPane scroll = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);

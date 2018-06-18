@@ -233,7 +233,7 @@ public class EditNode{
 
             //weight chiesto in input, se non inserito non disegna la linea
             edgeSN.setLine(line, weight,edgeSN,edgeFN);
-            edgeFN.setLine(line, weight,edgeSN,edgeFN);
+            edgeFN.setLine(line, weight,edgeFN,edgeSN);
             edge_1 = edgeSN.getEdges(line, weight);
             layout.getChildren().removeAll(edgeSN.get_ElementBox(), edgeFN.get_ElementBox());
             layout.getChildren().addAll(line);

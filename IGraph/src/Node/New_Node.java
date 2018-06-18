@@ -6,7 +6,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import java.lang.Object;
-import org.apache.commons.lang3.RandomStringUtils;
 import java.util.LinkedList;
 import static javafx.scene.paint.Color.*;
 
@@ -367,12 +366,7 @@ public class New_Node<T> {
 
         Integer t;
         Double rand1;
-        String ASCII;
         Integer index = 0;
-        rand1 = Math.random() * 100 + 0;
-        t = rand1.intValue();
-        System.out.println("RAND 1: " + t);
-        if (t <= 49 && t >= 0) {
 
             rand1 = Math.random() * 9;
             t = rand1.intValue();
@@ -380,7 +374,7 @@ public class New_Node<T> {
             for (New_Node node : list) {
                 if (node.getElement().equals(t.toString())) {
 
-                    rand1 = Math.random() * 9;
+                    rand1 = Math.random() * 999;
                     t = rand1.intValue();
 
                     index = 0;
@@ -399,32 +393,7 @@ public class New_Node<T> {
 
             }
             return t.toString();
-        } else if (t <= 100 && t >= 50) {
-            ASCII = RandomStringUtils.randomAlphabetic(1);
-            for (New_Node node : list) {
-                if (node.getElement().equals(ASCII)) {
-                    ASCII = RandomStringUtils.randomAlphabetic(1);
-                    index = 0;
-                    while (index < list.size()) {
-                        if (list.get(index).getElement().equals(ASCII)) {
-                            System.out.println(ASCII + "UGUALE");
 
-
-                            ASCII = RandomStringUtils.randomAlphabetic(1);
-                            index = 0;
-                        } else index++;
-                    }
-                    break;
-
-                }
-
-            }
-            System.out.println("ASCII: " + ASCII);
-            return ASCII;
-
-
-        }
-        return ("NE");
 
     }
 

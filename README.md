@@ -7,6 +7,7 @@ Vittoria Ferri
 "git clone https://github.com/riccardopreite/ALGRAPH.git"
 
 # COME ESEGUIRE
+Nella cartella Igraph_jar è presente il file eseguibile .jar, per avviare il programma è sufficiente fare doppio click sul file per eseguirlo.
 
 # DESCRIZIONE
 L’algoritmo di Kruskal ha ispirato il progetto Algraph, un’applicazione specializzata nella “creazione”

@@ -1,0 +1,38 @@
+// Menù Aiuto
+
+Come iniziare:
+Si può scegliere tra tre alternative:
+Nuovo: Apre una nuova finestra;
+Apri: Selezionare un file .txt per creare un Grafo con i dettagli del documento.(Leggere Example.txt per vedere come scrivere un file di input)
+Genera Random: Crea un Grafo random, specificando solamente il numero di vertici, richiesto come input.
+
+
+Come usare il programma:
+È possibile aggiungere, eliminare nodi o cambiare il valore degli elementi che contengono. Creare, cancellare gli archi o cambiarne il peso. Praticamente, è possibile cambiare in qualsiasi momento la struttura da visualizzare.
+
+Nodo:
+
+Aggiungi Nodo: 
+Modifica->Nodo->Aggiungi Nodo: questa opzione permette di scegliere la parte di schermo dove si vuole inserire il nodo, poi fornisce l'opzione tramite pop-up di scegliere il valore dell'elemento e creare il nodo.
+
+Elimina Nodo: l'opzione di cancellazione del nodo viene azionata con il click del tasto destro del mouse sul nodo che si vuole eliminare con la comparsa di una finestra di dialogo.
+
+Modifica Elemento: 
+Modifica->Nodo->Modifica elemento: voce di menù che permette di scegliere un nodo e cambiarne il valore dell'elemento nella finestra che compare sullo schermo.
+
+Arco:
+
+Aggiungi Arco:
+Modifica->Arco->Aggiungi Arco: voce di menù che crea un arco tra due nodi selezionati. In poche parole scegliete i nodi tra cui creare l'arco e inserite il valore del peso nella finestra di dialogo.
+
+Elimina Arco:
+Modifca->Arco->Elimina Arco: stesso funzionamento di Add Edge, si seleziona la coppia di nodi di cui si vuole cancellare l'arco.
+
+Modifica Peso:
+Modifica->Arco->Modifica Peso: simile alle altre opzione di modifica degli archi: scegliere i nodi per specificare l'arco di cui si vuole modificare il peso e cambiare il valore nella finestra di dialogo.
+
+Aiuto:
+Mostra nuovamente la guida.
+
+Come chiudere:
+Il file può essere salvato in File->Salva Come, o chiudendo la finestra del programma verrà visualizzata una finestra di dialogo che consente di scegliere se salvare il file prima di chiudere. Una volta salvato, è possibile riaprirlo e modificarlo nuovamente, e ovviamente salvare la nuova versione.

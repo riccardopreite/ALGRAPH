@@ -1,7 +1,7 @@
 # ALGRAPH
 Autori
-Riccardo Preite
-Vittoria Ferri
+IT: Riccardo Preite
+Design: Vittoria Ferri
 
 # SCARICARE IL REPO
 "git clone https://github.com/riccardopreite/ALGRAPH.git"
